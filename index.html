@@ -178,7 +178,7 @@ const CONFIG = {
   github: "yashnarbek-dev",
   telegram: "Yashnarbek_dev",
   linkedin: "",                   // full URL (leave "" to hide)
-  resumeUrl: "",                  // e.g. "resume.pdf"
+  resumeUrl: "Yashnarbek_Gofirjonov_Resume.pdf",   // upload this PDF next to index.html
   olympiadYear: "",               // e.g. "2025"
   mathbookRole: "",               // e.g. "wrote the algebra chapters"
 };
@@ -270,6 +270,7 @@ const I18N = {
     },
     music: { title: "♫ songs I code to", count: n => `${n} tracks`, note: "Links open each song on YouTube or Spotify. Type play 1–8.", usage: "Usage: play 1–8", opening: "Opening" },
     langSet: "Language set to English.",
+    resumeLinks: ["open", "download", "One page: education, teaching, projects, honors and skills."],
   },
   uz: {
     label: "O'zbekcha", or: "yoki",
@@ -333,6 +334,7 @@ const I18N = {
     },
     music: { title: "♫ kod yozayotganda tinglaydiganlarim", count: n => `${n} ta qo'shiq`, note: "Havolalar har bir qo'shiqni YouTube yoki Spotify'da ochadi. play 1–8 deb yozing.", usage: "Foydalanish: play 1–8", opening: "Ochilmoqda:" },
     langSet: "Til o'zgardi: O'zbekcha.",
+    resumeLinks: ["ochish", "yuklab olish", "Bir sahifa: ta'lim, o'qituvchilik, loyihalar, yutuqlar va ko'nikmalar (ingliz tilida)."],
   },
   ru: {
     label: "Русский", or: "или",
@@ -396,6 +398,7 @@ const I18N = {
     },
     music: { title: "♫ под что я пишу код", count: n => `${n} треков`, note: "Ссылки открывают каждую песню на YouTube или Spotify. Введите play 1–8.", usage: "Использование: play 1–8", opening: "Открываю:" },
     langSet: "Язык: русский.",
+    resumeLinks: ["открыть", "скачать", "Одна страница: образование, преподавание, проекты, награды и навыки (на английском)."],
   },
 };
 let LANG = "en";
@@ -676,7 +679,13 @@ const COMMANDS = {
       return `${esc(M.opening)} ${link(url, `${song} — ${artist}`)}`;
     } },
 
-  resume: { run: () => CONFIG.resumeUrl ? link(CONFIG.resumeUrl, "resume (PDF)") : `<span class="muted">${esc(T().resumeSoon)}</span> ${c("about")}` },
+  resume: { run: () => {
+      if (!CONFIG.resumeUrl) return `<span class="muted">${esc(T().resumeSoon)}</span> ${c("about")}`;
+      const [open, download, oneLine] = T().resumeLinks;
+      return `<div class="card"><div class="t" style="color:var(--accent);font-weight:700">${esc(CONFIG.name)} · Resume (PDF)</div>
+        <p class="muted" style="margin:6px 0 12px">${esc(oneLine)}</p>
+        <div class="cmdrow">${link(CONFIG.resumeUrl, open + " ↗")}<a href="${esc(CONFIG.resumeUrl)}" download>${esc(download)} ↓</a></div></div>`;
+    } },
   clear: { run: () => { out.innerHTML = ""; return null; } },
   contact: { run: () => `<div class="card">${rows(CONTACTS().map(([n]) => contactRow[n]()))}</div>` },
   email: { run: () => rows([contactRow.email()]) },
