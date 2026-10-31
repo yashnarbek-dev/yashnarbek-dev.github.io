@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yashnarbek G'ofirjonov's Portfolio</title>
+<meta name="description" content="Yashnarbek G'ofirjonov: 17, from Asaka, Uzbekistan. Self-taught developer and coding teacher, heading into Computer Science and cybersecurity.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000000;
+    --fg: #ffebcd;
+    --accent: #5abb9a;
+    --muted: #b5a68f;
+    --pink: #f4a3b4;
+    --line: rgba(90, 187, 154, 0.18);
+    --card-border: rgba(90, 187, 154, 0.3);
+    --card-border-soft: rgba(90, 187, 154, 0.14);
+    --card-bg: rgba(255, 235, 205, 0.03);
+    --fs: 19px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); }
+  body { font-family: "Geist Mono", ui-monospace, Consolas, monospace; font-size: var(--fs); line-height: 1.55; min-height: 100vh; }
+  ::selection { background: var(--accent); color: var(--bg); }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--fg); border-radius: 3px; }
+  html { scrollbar-color: var(--fg) var(--bg); scrollbar-width: thin; }
+
+  .term { padding: 26px 40px 80px; min-height: 100vh; cursor: text; }
+  pre { margin: 0; font-family: inherit; }
+  p { margin: 0 0 10px; }
+  h3 { font-size: 1.17em; margin: 24px 0 10px; font-weight: 700; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  .acc { color: var(--accent); }
+  .muted { color: var(--muted); }
+  .pink { color: var(--pink); }
+  .block { margin: 0 0 20px; }
+  .rv { animation: rise .4s ease both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  /* boot screen */
+  .boot { font-size: .85em; line-height: 1.6; margin: 0 0 12px; }
+  .boot .ok { color: var(--accent); font-weight: 700; }
+  .boot .dim { color: var(--muted); }
+  .cursor::after { content: "▌"; color: var(--fg); animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .skip { position: fixed; right: 18px; bottom: 14px; font-size: 12px; color: var(--muted); opacity: .7; }
+
+  .cmd { color: var(--accent); cursor: pointer; background: none; border: 0; padding: 0; font: inherit; text-align: left; }
+  .cmd:hover, .cmd:focus-visible { text-decoration: underline; outline: none; }
+  .cmd.on { color: var(--bg); background: var(--accent); border-radius: 4px; padding: 0 4px; }
+  .cmdlist { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .cmdrow { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; }
+
+  /* home */
+  .hero {
+    display: grid; max-width: 1280px; gap: 0 48px; align-items: start;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 520px);
+    grid-template-areas: "intro art" "cmds art";
+  }
+  .hero .intro { grid-area: intro; }
+  .hero .cmds { grid-area: cmds; }
+  .hero .art { grid-area: art; position: relative; }
+  .banner { color: var(--accent); font-size: 1.05em; line-height: 1.2; margin: 6px 0 24px; min-height: 8.4em; }
+  .typed { min-height: 1.55em; }
+  .typed::after { content: "▌"; color: var(--accent); animation: blink 1s steps(1) infinite; }
+  .typed.done::after { content: ""; }
+  .art { opacity: 0; transition: opacity 1.6s ease, transform 1.6s ease; transform: scale(.96); }
+  .art.on { opacity: 1; transform: none; }
+
+  canvas.portrait { display: block; width: 100%; touch-action: pan-y; cursor: grab; }
+  .hint { color: var(--muted); font-size: 12px; text-align: center; opacity: .6; margin-top: 2px; }
+
+  /* prompt */
+  .prompt { white-space: nowrap; font-weight: 700; }
+  .prompt .u { color: var(--accent); }
+  .echo { margin: 0 0 14px; scroll-margin-top: 18px; }
+  .input-row { display: flex; align-items: baseline; gap: 1ch; }
+  .input-row[hidden] { display: none; }
+  #cmd { flex: 1; min-width: 6ch; background: transparent; border: 0; outline: none; color: var(--fg); font: inherit; caret-color: var(--fg); padding: 0; }
+  .enter-hint { color: var(--muted); font-size: .8em; animation: blink 1.1s steps(1) infinite; white-space: nowrap; }
+
+  /* cards */
+  .card { max-width: 1240px; border: 1.5px solid var(--card-border); border-radius: 18px; padding: 30px 30px 22px; background: var(--card-bg); }
+  .name { font-size: 1.7em; font-weight: 700; line-height: 1.2; }
+  .tag { color: var(--muted); margin: 6px 0 18px; }
+  .beat { display: grid; grid-template-columns: 3ch 11ch minmax(0, 1fr); gap: 0 2ch; padding: 14px 0; border-top: 1px dashed var(--line); }
+  .beat .n { color: var(--muted); }
+  .beat .lbl { color: var(--accent); font-weight: 700; }
+  .beat p { margin: 0; }
+  .next { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; }
+
+  .grid { max-width: 1240px; columns: 2 460px; column-gap: 28px; }
+  .pcard { break-inside: avoid; display: inline-block; width: 100%; margin: 0 0 28px; border: 1.5px solid var(--card-border-soft); border-radius: 18px; padding: 22px 22px; background: var(--card-bg); }
+  .pcard.featured { border-color: var(--card-border); }
+  .preview { border: 1px solid #2a2a2a; border-radius: 10px; background: #0b0b0b; padding: 10px 12px 18px; margin-bottom: 16px; font-size: 14px; overflow: hidden; }
+  .preview img { display: block; width: 100%; border-radius: 6px; }
+  a.preview { display: block; color: inherit; text-decoration: none; transition: border-color .2s; }
+  a.preview:hover { border-color: var(--accent); }
+  .dots span { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+  .dots span:nth-child(1) { background: #ff5f57; } .dots span:nth-child(2) { background: #febc2e; } .dots span:nth-child(3) { background: #28c840; }
+  .preview .path { color: var(--muted); margin-top: 10px; }
+  .preview .big { color: var(--fg); font-weight: 700; font-size: 20px; margin-top: 6px; word-break: break-word; }
+  .badge { display: inline-block; font-size: .7em; color: var(--bg); background: var(--accent); border-radius: 6px; padding: 1px 8px; margin-left: 8px; vertical-align: middle; }
+  .badge.draft { background: var(--muted); }
+  .pcard .title { color: var(--accent); font-weight: 700; font-size: 1.3em; line-height: 1.25; margin-bottom: 6px; }
+  .pcard .title a.tlink { color: var(--accent); text-decoration: none; }
+  .pcard .title a.tlink:hover { text-decoration: underline; }
+  .pcard .tech { color: var(--muted); font-size: .85em; margin-bottom: 8px; }
+  .pcard .repo { margin-top: 10px; font-size: .85em; }
+  .icons { display: flex; gap: 12px; margin-top: 12px; }
+  .icons a { display: inline-flex; width: 32px; height: 32px; border-radius: 50%; background: var(--fg); align-items: center; justify-content: center; }
+  .icons svg { width: 18px; height: 18px; fill: #000; }
+
+  .rows { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 3ch; }
+  .rows .k { color: var(--accent); font-weight: 700; }
+  .entry { margin: 0 0 20px; }
+  .entry .t { color: var(--accent); font-weight: 700; }
+  .entry .s { color: var(--muted); font-size: .9em; }
+  .copy { margin-left: 1ch; }
+  .note { color: var(--muted); font-size: .85em; }
+
+  /* music player */
+  .player .head { display: flex; justify-content: space-between; gap: 2ch; margin-bottom: 12px; flex-wrap: wrap; }
+  .player .head b { font-size: 1.1em; }
+  .track { display: grid; grid-template-columns: 3ch minmax(0, 1.3fr) minmax(0, 1fr) auto; gap: 0 2ch; padding: 9px 0; border-top: 1px dashed var(--line); align-items: baseline; }
+  .track .n { color: var(--muted); }
+  .track .song { font-weight: 700; }
+  .track .artist { color: var(--muted); }
+  .track .go { display: flex; gap: 12px; white-space: nowrap; }
+  .eq { display: inline-flex; gap: 2px; align-items: flex-end; height: .9em; margin-right: 1ch; }
+  .eq i { width: 3px; background: var(--accent); animation: eq 1s ease-in-out infinite; }
+  .eq i:nth-child(2) { animation-delay: .2s; } .eq i:nth-child(3) { animation-delay: .4s; } .eq i:nth-child(4) { animation-delay: .1s; }
+  @keyframes eq { 0%, 100% { height: 25%; } 50% { height: 100%; } }
+
+  @media (prefers-reduced-motion: reduce) { .rv { animation: none; } .art { transition: none; } .typed::after, .cursor::after, .eq i { animation: none; } }
+  @media (hover: none) { .hint { display: none; } }
+  @media (max-width: 1100px) { :root { --fs: 17px; } .term { padding: 22px 26px 70px; } }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; grid-template-areas: "intro" "art" "cmds"; }
+    .hero .art { width: min(100%, 360px); justify-self: center; margin: 0 0 8px; }
+  }
+  @media (max-width: 600px) {
+    :root { --fs: 15px; }
+    #cmd { font-size: 16px; }
+    .term { padding: 16px 14px 60px; }
+    .card { padding: 20px 16px 14px; }
+    .beat { grid-template-columns: 3ch minmax(0, 1fr); }
+    .beat p { grid-column: 1 / -1; margin-top: 4px; }
+    .rows { grid-template-columns: 1fr; gap: 2px; }
+    .rows .k { margin-top: 10px; }
+    .track { grid-template-columns: 3ch minmax(0, 1fr); }
+    .track .artist, .track .go { grid-column: 2; }
+  }
+</style>
+</head>
+<body>
+<main class="term" id="term">
+  <div id="out" role="log" aria-live="polite"></div>
+  <div class="input-row" id="input-row" hidden>
+    <label for="cmd" class="prompt"><span class="u">yashnarbek@profile</span>:~$</label>
+    <input id="cmd" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type a command">
+    <span class="enter-hint" id="enter-hint" hidden></span>
+  </div>
+</main>
+
+<script>
+/* ============================================================
+   EDIT YOUR INFO HERE
+   ============================================================ */
+const CONFIG = {
+  name: "Yashnarbek G'ofirjonov",
+  email: "yashnarbekgofirjonov@gmail.com",
+  github: "yashnarbek-dev",
+  telegram: "Yashnarbek_dev",
+  linkedin: "",                   // full URL (leave "" to hide)
+  resumeUrl: "",                  // e.g. "resume.pdf"
+  olympiadYear: "",               // e.g. "2025"
+  mathbookRole: "",               // e.g. "wrote the algebra chapters"
+};
+
+const PROJECTS = [
+  { key: "msr", name: "msr: Telegram Test Bot", badge: "featured", tech: "Python · SQLite · Alembic · Telegram Mini App", repo: "msr" },
+  { key: "nok", name: "N.O.K: Network of Knowledge", badge: "draft", tech: "Django · SQLite · Bootstrap 5 · OpenAI API", repo: "N.O.K" },
+  { key: "math", cmd: "mathbook" },
+  { key: "cinema", name: "cinema-together-bot", tech: "Python · Telegram", repo: "cinema-together-bot" },
+  { key: "survey", name: "prize_survey_django", tech: "Python · Django", repo: "prize_survey_django" },
+  { key: "words", name: "Smart_words", tech: "Dart", repo: "Smart_words" },
+  { key: "translator", name: "Alfa-Betta-translator", tech: "Java", repo: "Alfa-Betta-translator" },
+];
+
+// songs I code to (links open YouTube / Spotify, nothing is downloaded)
+const TRACKS = [
+  ["Shape of My Heart", "Sting"],
+  ["Apocalypse", "Cigarettes After Sex"],
+  ["Just the Two of Us", "GlitchRex"],
+  ["Smooth Operator", "Sade"],
+  ["Devil Eyes", "Hippie Sabotage"],
+  ["Mr. Sandman", "The Chordettes"],
+  ["End of Beginning", "Djo"],
+  ["WILDFLOWER", "Billie Eilish"],
+];
+/* ============================================================ */
+
+/* ================= languages ================= */
+const I18N = {
+  en: {
+    label: "English", or: "or",
+    welcome: "Welcome to my personal portfolio! (Version 2.0)",
+    typeHelp: ["Type", " to see the list of available commands, or just click one."],
+    newLine: "msr scores SAT practice tests with Rasch IRT", seeIt: "see it",
+    avail: "Available Commands:", contactMe: "Contact Me:", extras: "Extras:", language: "Language:",
+    hint: "move your cursor ↔", pressEnter: "↵ press Enter",
+    keys: "Tab = autocomplete · ↑/↓ = history · Ctrl+L = clear", allAtOnce: "all at once",
+    notFound: (n, h) => `Command not found: ${n}. Type ${h} to see the list of available commands.`,
+    desc: { help: "list all commands", about: "my story in 5 lines", whoami: "who are you?", projects: "things I've built", teaching: "how I teach code",
+      achievements: "results and awards", skills: "what I work with", miscellaneous: "a few more things about me", music: "songs I code to",
+      resume: "my CV", home: "back to the start screen", clear: "clear the terminal", lang: "change language: en / uz / ru" },
+    tag: "17 · Asaka, Uzbekistan · self-taught developer · coding teacher",
+    beats: [
+      ["learned", "I taught myself Python, Django and Linux from free YouTube videos."],
+      ["taught", "I asked 20 education centers to let me teach. 19 said I was too young. The 20th gave me a test and a demo lesson, and hired me. I've taught there for two summers."],
+      ["proved", "At the regional computer science olympiad, I took 1st. Two classmates I had tutored took 2nd and 3rd."],
+      ["built", "msr, a Telegram app that scores SAT practice tests with Rasch IRT. Now building N.O.K, a learning platform with an AI teacher."],
+      ["next", "Computer Science and cybersecurity, and free online classes, like the videos that taught me."],
+    ],
+    andYou: "and you?",
+    whoami: ["visitor", "(you're a guest here. Try", ")"],
+    sudo: "visitor is not in the sudoers file. This incident will be reported.", kidding: "(just kidding)",
+    resumeSoon: "Resume coming soon. Meanwhile, try", allCode: "All my code:", noHistory: "No history yet.",
+    teaching: [
+      ["Coding instructor", "education center · summers 2025 and 2026", `I applied to 20 education centers. 19 said I was too young. The one that tested me hired me. I teach Python basics, Linux and an introduction to penetration testing. My first class had 12 students, and I was nervous. Their first program was print("Hello, world"). One student changed it to print his own name.`],
+      ["Python tutor", "5 classmates · 6 months", "I taught them while I was still learning myself. Three went to the regional olympiad and placed 2nd, 3rd and 14th."],
+      ["English tutor", "my younger brother and 2 of his friends", "At home, with my own books."],
+      ["What it taught me", "", "When you teach, you have to really know it. Every hard question made me better."],
+    ],
+    achievements: [
+      ["1st place", "Regional Computer Science Olympiad (under 20)"],
+      ["My students", "2nd and 3rd place at the same olympiad"],
+      ["At school", "#1 in coding · top 3 in English · top 10 in math"],
+      ["English", "IELTS Academic 7.0 (C1), Listening 8.5"],
+      ["Self-taught", "chess from 0 to 900 Elo in one year"],
+    ],
+    skills: [
+      ["Programming", "Python (Django, Telegram bots), Java, Dart"],
+      ["Linux", "Kali, Parrot OS, Ubuntu, Arch, Tails and more"],
+      ["Security", "penetration testing basics, Wi-Fi security demos (with permission)"],
+      ["Tools", "Git, GitHub, SQLite, Alembic"],
+      ["Teaching", "explaining code to complete beginners"],
+      ["Languages", "Uzbek (native), English (C1, IELTS 7.0)"],
+      ["School", "Asaka District Specialized School · grade 12 · graduating 2027"],
+    ],
+    misc: ["I sold my smartphone. Keyboard phone only, for calls.", "Learning guitar. Studying for a driving licence.", "Reading about space science and human psychology."],
+    mathbook: [["Team", "3 classmates"], ["Plan", "4 books, from school math up to graduate-level topics"], ["Status", "book 1 is finished"], ["My role", null]],
+    neofetch: [["OS", "Human v17 (Uzbekistan)"], ["Uptime", "17 years"], ["Shell", "python3"], ["Distros", "Kali, Parrot, Ubuntu, Arch, Tails"],
+      ["Phone", "keyboard phone, no smartphone"], ["Focus", "CS + cybersecurity"], ["Teaching", "20 centers asked, 1 said yes"], ["Eyewear", "classic wayfarers"]],
+    copy: ["[copy]", "[copied ✓]", "[select and copy]"],
+    proj: {
+      msr: { desc: "Exam prep inside Telegram. It sends test PDFs, checks answers in a Mini App, scores SAT and National Certificate practice tests with the Rasch (1PL IRT) model, and generates PDF certificates. Five test categories and an admin panel, all in Telegram." },
+      nok: { desc: "A learning platform with student, teacher and CEO roles. Students buy courses with an in-app coin, teachers earn from them, and an AI teacher answers questions. Referrals, XP, tournaments and reviews." },
+      math: { name: "Math Book Series", tech: "Team of 3 · book 1 finished", desc: "Four books that take math from school level up to graduate-level topics, written with two classmates." },
+      cinema: { desc: "Anonymous chat plus watching movies together, in a Telegram bot." },
+      survey: { desc: "A survey website built with Django." },
+      words: { desc: "A word game. Just have fun!" },
+      translator: { desc: "A translator app." },
+    },
+    music: { title: "♫ songs I code to", count: n => `${n} tracks`, note: "Links open each song on YouTube or Spotify. Type play 1–8.", usage: "Usage: play 1–8", opening: "Opening" },
+    langSet: "Language set to English.",
+  },
+  uz: {
+    label: "O'zbekcha", or: "yoki",
+    welcome: "Shaxsiy portfoliomga xush kelibsiz! (2.0-versiya)",
+    typeHelp: ["Buyruqlar ro'yxatini ko'rish uchun", " deb yozing yoki shunchaki birini bosing."],
+    newLine: "msr SAT mashq testlarini Rasch IRT modeli bilan baholaydi", seeIt: "ko'rish",
+    avail: "Mavjud buyruqlar:", contactMe: "Bog'lanish:", extras: "Qo'shimcha:", language: "Til:",
+    hint: "kursorni harakatlantiring ↔", pressEnter: "↵ Enter tugmasini bosing",
+    keys: "Tab = avtoto'ldirish · ↑/↓ = tarix · Ctrl+L = tozalash", allAtOnce: "hammasi birdaniga",
+    notFound: (n, h) => `Buyruq topilmadi: ${n}. Buyruqlar ro'yxati uchun ${h} deb yozing.`,
+    desc: { help: "barcha buyruqlar", about: "hikoyam 5 qatorda", whoami: "siz kimsiz?", projects: "yaratgan loyihalarim", teaching: "qanday dars beraman",
+      achievements: "natijalar va yutuqlar", skills: "nimalar bilan ishlayman", miscellaneous: "men haqimda yana bir oz", music: "kod yozayotganda tinglaydiganlarim",
+      resume: "rezyumem", home: "bosh ekranga qaytish", clear: "terminalni tozalash", lang: "tilni o'zgartirish: en / uz / ru" },
+    tag: "17 yosh · Asaka, O'zbekiston · mustaqil o'rgangan dasturchi · dasturlash o'qituvchisi",
+    beats: [
+      ["o'rgandim", "Python, Django va Linuxni bepul YouTube videolaridan mustaqil o'rgandim."],
+      ["o'rgatdim", "20 ta o'quv markazidan dars berishga ruxsat so'radim. 19 tasi juda yoshligimni aytdi. 20-chisi meni test va namunaviy dars bilan sinab, ishga oldi. U yerda ikki yoz dars berdim."],
+      ["isbotladim", "Viloyat informatika olimpiadasida 1-o'rinni oldim. Men o'qitgan ikki sinfdoshim 2- va 3-o'rinlarni egalladi."],
+      ["yaratdim", "msr — SAT mashq testlarini Rasch IRT bilan baholaydigan Telegram ilovasi. Hozir N.O.K ustida ishlayapman — sun'iy intellekt o'qituvchisi bor ta'lim platformasi."],
+      ["keyingi", "Informatika va kiberxavfsizlik, hamda meni o'qitgan videolar kabi bepul onlayn darslar."],
+    ],
+    andYou: "siz-chi?",
+    whoami: ["mehmon", "(bu yerda siz mehmonsiz. Sinab ko'ring:", ")"],
+    sudo: "visitor sudoers ro'yxatida yo'q. Bu holat haqida xabar beriladi.", kidding: "(hazil)",
+    resumeSoon: "Rezyume tez orada. Hozircha buni sinab ko'ring:", allCode: "Barcha kodlarim:", noHistory: "Hali tarix yo'q.",
+    teaching: [
+      ["Dasturlash o'qituvchisi", "o'quv markazi · 2025 va 2026-yil yozi", `20 ta o'quv markaziga murojaat qildim. 19 tasi juda yoshligimni aytdi. Meni sinab ko'rgan markaz ishga oldi. Python asoslari, Linux va penetratsion testlashga kirishdan dars beraman. Birinchi guruhimda 12 o'quvchi bor edi va men hayajonlangan edim. Ularning birinchi dasturi print("Hello, world") bo'ldi. Bir o'quvchi uni o'z ismini chiqaradigan qilib o'zgartirdi.`],
+      ["Python o'qituvchisi", "5 sinfdosh · 6 oy", "Ularni o'zim hali o'rganayotgan paytimda o'qitdim. Uchtasi viloyat olimpiadasiga borib, 2-, 3- va 14-o'rinlarni egalladi."],
+      ["Ingliz tili o'qituvchisi", "ukam va uning 2 do'sti", "Uyda, o'z kitoblarim bilan."],
+      ["Bu menga nimani o'rgatdi", "", "O'rgatish uchun mavzuni chindan bilishing kerak. Har bir qiyin savol meni kuchliroq qildi."],
+    ],
+    achievements: [
+      ["1-o'rin", "Viloyat informatika olimpiadasi (20 yoshgacha)"],
+      ["O'quvchilarim", "o'sha olimpiadada 2- va 3-o'rinlar"],
+      ["Maktabda", "dasturlashda 1-o'rin · ingliz tilida top-3 · matematikada top-10"],
+      ["Ingliz tili", "IELTS Academic 7.0 (C1), Listening 8.5"],
+      ["Mustaqil", "bir yilda shaxmatda 0 dan 900 Elo gacha"],
+    ],
+    skills: [
+      ["Dasturlash", "Python (Django, Telegram botlar), Java, Dart"],
+      ["Linux", "Kali, Parrot OS, Ubuntu, Arch, Tails va boshqalar"],
+      ["Xavfsizlik", "penetratsion testlash asoslari, Wi-Fi xavfsizligi namoyishlari (ruxsat bilan)"],
+      ["Vositalar", "Git, GitHub, SQLite, Alembic"],
+      ["O'qitish", "kodni noldan boshlovchilarga tushuntirish"],
+      ["Tillar", "o'zbek (ona tili), ingliz (C1, IELTS 7.0)"],
+      ["Maktab", "Asaka tuman ixtisoslashtirilgan maktabi · bitiruvchi sinf · 2027"],
+    ],
+    misc: ["Smartfonimni sotdim. Faqat qo'ng'iroqlar uchun tugmali telefon.", "Gitara chalishni o'rganyapman. Haydovchilik guvohnomasiga tayyorlanyapman.", "Koinot ilmi va inson psixologiyasi haqida o'qiyman."],
+    mathbook: [["Jamoa", "3 sinfdosh"], ["Reja", "maktab matematikasidan magistratura darajasidagi mavzulargacha 4 ta kitob"], ["Holat", "1-kitob tayyor"], ["Mening rolim", null]],
+    neofetch: [["OS", "Inson v17 (O'zbekiston)"], ["Uptime", "17 yil"], ["Shell", "python3"], ["Distrolar", "Kali, Parrot, Ubuntu, Arch, Tails"],
+      ["Telefon", "tugmali telefon, smartfonsiz"], ["Fokus", "informatika + kiberxavfsizlik"], ["O'qitish", "20 ta markaz, 1 tasi rozi bo'ldi"], ["Ko'zoynak", "klassik wayfarer"]],
+    copy: ["[nusxalash]", "[nusxalandi ✓]", "[belgilab nusxalang]"],
+    proj: {
+      msr: { desc: "Telegram ichida imtihonga tayyorgarlik. Test PDF fayllarini yuboradi, javoblarni Mini App'da tekshiradi, SAT va Milliy sertifikat mashq testlarini Rasch (1PL IRT) modeli bilan baholaydi va PDF sertifikat yaratadi. 5 ta test toifasi va admin panel — hammasi Telegramda." },
+      nok: { desc: "O'quvchi, o'qituvchi va CEO rollariga ega ta'lim platformasi. O'quvchilar kurslarni ichki tanga bilan sotib oladi, o'qituvchilar daromad qiladi, sun'iy intellekt o'qituvchisi savollarga javob beradi. Referallar, XP, turnirlar va sharhlar." },
+      math: { name: "Matematika kitoblari", tech: "3 kishilik jamoa · 1-kitob tayyor", desc: "Ikki sinfdoshim bilan yozayotgan 4 ta kitob: matematikani maktab darajasidan magistratura darajasidagi mavzulargacha olib boradi." },
+      cinema: { desc: "Anonim chat va birgalikda kino ko'rish — Telegram botda." },
+      survey: { desc: "Django'da yaratilgan so'rovnoma sayti." },
+      words: { desc: "So'z o'yini. Shunchaki zavqlaning!" },
+      translator: { desc: "Tarjimon ilova." },
+    },
+    music: { title: "♫ kod yozayotganda tinglaydiganlarim", count: n => `${n} ta qo'shiq`, note: "Havolalar har bir qo'shiqni YouTube yoki Spotify'da ochadi. play 1–8 deb yozing.", usage: "Foydalanish: play 1–8", opening: "Ochilmoqda:" },
+    langSet: "Til o'zgardi: O'zbekcha.",
+  },
+  ru: {
+    label: "Русский", or: "или",
+    welcome: "Добро пожаловать в моё портфолио! (Версия 2.0)",
+    typeHelp: ["Введите", ", чтобы увидеть список команд, или просто нажмите на любую."],
+    newLine: "msr оценивает пробные тесты SAT по модели Rasch IRT", seeIt: "смотреть",
+    avail: "Доступные команды:", contactMe: "Связаться со мной:", extras: "Дополнительно:", language: "Язык:",
+    hint: "двигайте курсором ↔", pressEnter: "↵ нажмите Enter",
+    keys: "Tab = автодополнение · ↑/↓ = история · Ctrl+L = очистить", allAtOnce: "все сразу",
+    notFound: (n, h) => `Команда не найдена: ${n}. Введите ${h}, чтобы увидеть список команд.`,
+    desc: { help: "все команды", about: "моя история в 5 строках", whoami: "кто вы?", projects: "что я создал", teaching: "как я преподаю",
+      achievements: "результаты и награды", skills: "с чем я работаю", miscellaneous: "ещё немного обо мне", music: "песни, под которые я пишу код",
+      resume: "моё резюме", home: "на главный экран", clear: "очистить терминал", lang: "сменить язык: en / uz / ru" },
+    tag: "17 лет · Асака, Узбекистан · разработчик-самоучка · преподаватель программирования",
+    beats: [
+      ["учился", "Я сам выучил Python, Django и Linux по бесплатным видео на YouTube."],
+      ["учил", "Я попросил 20 учебных центров дать мне преподавать. 19 сказали, что я слишком молод. Двадцатый дал мне тест и пробный урок — и взял на работу. Я преподавал там два лета."],
+      ["доказал", "На областной олимпиаде по информатике я занял 1-е место. Два одноклассника, которых я учил, заняли 2-е и 3-е."],
+      ["создал", "msr — Telegram-приложение, которое оценивает пробные тесты SAT по Rasch IRT. Сейчас создаю N.O.K — учебную платформу с ИИ-преподавателем."],
+      ["дальше", "Информатика и кибербезопасность, а также бесплатные онлайн-уроки — как те видео, по которым учился я."],
+    ],
+    andYou: "а вы?",
+    whoami: ["гость", "(вы здесь гость. Попробуйте", ")"],
+    sudo: "visitor нет в файле sudoers. Об этом инциденте будет сообщено.", kidding: "(шутка)",
+    resumeSoon: "Резюме скоро будет. А пока попробуйте", allCode: "Весь мой код:", noHistory: "История пока пуста.",
+    teaching: [
+      ["Преподаватель программирования", "учебный центр · лето 2025 и 2026", `Я обратился в 20 учебных центров. 19 сказали, что я слишком молод. Тот, что меня проверил, взял на работу. Я преподаю основы Python, Linux и введение в тестирование на проникновение. В моей первой группе было 12 учеников, и я волновался. Их первой программой была print("Hello, world"). Один ученик изменил её, чтобы она печатала его имя.`],
+      ["Репетитор по Python", "5 одноклассников · 6 месяцев", "Я учил их, пока сам ещё учился. Трое поехали на областную олимпиаду и заняли 2-е, 3-е и 14-е места."],
+      ["Репетитор по английскому", "мой младший брат и 2 его друга", "Дома, по моим книгам."],
+      ["Чему это меня научило", "", "Чтобы учить, нужно по-настоящему знать. Каждый трудный вопрос делал меня сильнее."],
+    ],
+    achievements: [
+      ["1-е место", "Областная олимпиада по информатике (до 20 лет)"],
+      ["Мои ученики", "2-е и 3-е места на той же олимпиаде"],
+      ["В школе", "№1 по программированию · топ-3 по английскому · топ-10 по математике"],
+      ["Английский", "IELTS Academic 7.0 (C1), Listening 8.5"],
+      ["Самоучка", "шахматы с 0 до 900 Elo за год"],
+    ],
+    skills: [
+      ["Программирование", "Python (Django, Telegram-боты), Java, Dart"],
+      ["Linux", "Kali, Parrot OS, Ubuntu, Arch, Tails и другие"],
+      ["Безопасность", "основы тестирования на проникновение, демонстрации безопасности Wi-Fi (с разрешения)"],
+      ["Инструменты", "Git, GitHub, SQLite, Alembic"],
+      ["Преподавание", "объясняю код полным новичкам"],
+      ["Языки", "узбекский (родной), английский (C1, IELTS 7.0)"],
+      ["Школа", "Асакинская районная специализированная школа · выпускной класс · 2027"],
+    ],
+    misc: ["Я продал смартфон. Только кнопочный телефон, для звонков.", "Учусь играть на гитаре. Готовлюсь к водительским правам.", "Читаю о космосе и психологии человека."],
+    mathbook: [["Команда", "3 одноклассника"], ["План", "4 книги: от школьной математики до тем уровня магистратуры"], ["Статус", "1-я книга готова"], ["Моя роль", null]],
+    neofetch: [["OS", "Человек v17 (Узбекистан)"], ["Uptime", "17 лет"], ["Shell", "python3"], ["Дистрибутивы", "Kali, Parrot, Ubuntu, Arch, Tails"],
+      ["Телефон", "кнопочный, без смартфона"], ["Фокус", "информатика + кибербезопасность"], ["Преподавание", "20 центров, 1 сказал «да»"], ["Очки", "классические wayfarer"]],
+    copy: ["[копировать]", "[скопировано ✓]", "[выделите и скопируйте]"],
+    proj: {
+      msr: { desc: "Подготовка к экзаменам прямо в Telegram. Бот отправляет PDF с тестами, проверяет ответы в Mini App, оценивает пробные тесты SAT и Национального сертификата по модели Rasch (1PL IRT) и создаёт PDF-сертификаты. 5 категорий тестов и админ-панель — всё в Telegram." },
+      nok: { desc: "Учебная платформа с ролями ученика, учителя и CEO. Ученики покупают курсы за внутреннюю монету, учителя на них зарабатывают, а ИИ-преподаватель отвечает на вопросы. Рефералы, XP, турниры и отзывы." },
+      math: { name: "Серия книг по математике", tech: "команда из 3 · 1-я книга готова", desc: "Четыре книги, которые ведут от школьной математики до тем уровня магистратуры. Пишу вместе с двумя одноклассниками." },
+      cinema: { desc: "Анонимный чат и совместный просмотр фильмов в Telegram-боте." },
+      survey: { desc: "Сайт с опросами на Django." },
+      words: { desc: "Игра в слова. Просто развлекайтесь!" },
+      translator: { desc: "Приложение-переводчик." },
+    },
+    music: { title: "♫ под что я пишу код", count: n => `${n} треков`, note: "Ссылки открывают каждую песню на YouTube или Spotify. Введите play 1–8.", usage: "Использование: play 1–8", opening: "Открываю:" },
+    langSet: "Язык: русский.",
+  },
+};
+let LANG = "en";
+try { const saved = localStorage.getItem("lang"); if (I18N[saved]) LANG = saved; } catch (e) {}
+const T = () => I18N[LANG];
+document.documentElement.lang = LANG;
+
+// 3D portrait point cloud built from the photo (ask Claude to regenerate it if the photo changes)
+const HEAD3D = {"v":4,"cols":100,"p":"g6kahitfttm|fqkqhj8fh8w-cyluhp8fg1o-nim6hv8fuft-e6lehv8fe1n-cim6hwqf7qtAf2l2hw9fe1o=cimahx9f5fu=nimahxrfteu#cimehx9f6hv-nimehxhfthv*cimihx8f6iv-nimihx8ftiv-cimmhx8f6iv-nimmhx8ftiv-cimqhx8f6iv-nimqhx8ftiv-cimuhx9f6iv=nimuhxkftivxcimyhx9f6iv-nimyhxsftiv#cin2hxff6iv*nin2hxvftiv%cin6hxof6ivAnin6hxhftiv*cinahxpf6ivAninahxvftiv%cinehxpf6ivAninehxkftivacinihxnf6ivaninihxhftiv*cinmhxkf6ivxninmhxaftiv=cinqhxnf6ivaninqhxbftiv=cinuhxjf6ivxninuhxbftiv=cinyhxef6iv+ninyhx9ftiv=cio2hxff6iv*nio2hx9ftiv=cio6hxcf6iv+nio6hxaftiv=cioahxef6iv+nioahx9ftiv=cioehxff6iv*nioehx9ftiv=cioihxff6iv*nioihx9ftiv=ciomhxcf6iv+niomhx9ftiv=cqlyhyafd4s=dalqhz7fg2p-gek2i0tf7ev|gijqi09fchy=gijmi08f5uj-gijyi19fa8u=cmm2i1df9hx+gijui19fbhy=eilai19fe2o=g2kii18fn9w-nem2i1tfsdv\\fykmi2kfc7uxdmlmi28fd2p-fmkui2efc3q+gejqi3tfmiy|gejui3tfmhz|jqkai3tfi7w\\cim2i38fluu-gejyi3tfmny|fekyi3afd2p=gejmi3tfniy|cmlyi3tfsmv/gejii3tf4tk|e2lei3zfs7r-nem6i3ifweqxeyl2i37fs9s-cilyi3tfijz-cmm6i3pf3dqAg2kei37fioy-fykei4zfihz/fukii4zfhgz/cului4xfxfq-fykii48fnky-eul6i4afd2p=fikui48fk7v-fqkmi4yfhyo/cmmei4rf2iq#nemei4rfxiq#cmmii4of2iqAnemii4tfxiq#cmmmi4tf2iq#nemmi4tfxiq%cmmqi4rf2iq#nemqi4rfxiq#cmmui4of2iqAnemui4jfxiqxcmmyi4sf2iq#nemyi4efxiq+cmn2i4tf2iq#nen2i49fxiq-cmn6i4of2iqAnen6i48fxiq-cmnai48f2iq-nenai47fxiq-cmnei48f2iq-nenei4afxiq=cmnii47f2iq-nenii4ufxiq%cmnmi47f2iq-nenmi4gfxiq*cmnqi49f2iq-nenqi4sfxiq#cmnui4rf2iq#nenui4tfxiq%cmnyi4qf2iqAnenyi4sfxiq#cmo2i4tf2iq#neo2i4jfxiqxcmo6i4kf2iqxneo6i4efxiq+cmoai4ef2iq+neoai4afxiq=cmoei4ef2iq+neoei49fxiq=cmoii4df2iq+neoii4afxiq=cmomi4bf2iq=neomi49fxiq=f6kyi4yfgbx-h2cui4ffggz*gqcyi4kfiizxgucyi49fgiz=gid2i4jfihzxgmd2i44biiz:gqd2i4gfiiz*gud2i4hfh2p*gmd6i4ffi1m*gqd6i4hfa2l*kqemi44bv7l:kueqi4tfyim|kueui4dfxbl+eyg2i4jf0imxeyg6i4jf1imxf2gai42b3rk.f2gei42b0il.f2gii42b1im.f2gmi4cfiiz+f6gmi42b3rk.f6gqi4bfiiz=fagqi41b5uk.g6k6i45fiyo:g2kai4tfyio/fmkqi4tfyjo/fqiai4tf1im/fukmi48flgz-fukqi4bf2am=ged6i47fidy-gid6i4jfi1nxfqi6i4tf0jl\\cmmai4sf2hq#nemai4ofxhqAgad6i4tfiiz/gadai4kfh0lxeul2i5zfkjz-gycyi53bghz.h2cyi55bg7v:h6cui52bfgz.gyd2i5hfd2n*eelai58fn5s-fakyi58fj5u-fmi6i5ufiiz|dilmi5tfl5t-g6dai56bi1m-d6lqi5tfq8t-eml6i5tfhby-gmjqi58f4tj-hacui55bd7u:gek6i5gfa5r*g2dai5vfi9x/dqlii5zfh9x-eql6i57fj4t-h6cyi5cfb3p+jmk6i5vfsiw%dylii59fb3p=kqeii5jfyimxdulii5tfh5t-fydei62bf1m.gmjui6af4fs=culyi6ef49p+hicqi6ufi8w-d2lui69f2bn=gik2i7bf58p=gedai7jf92kxdelqi7af57o=kmeai7hfygm*fih6i78f3rl-fqi2i7tf1ml\\kie2i7kfygnxcqm2i7cf76p+gmjyi7af4aq=nam2i79fwfs=f6l2i7af65n=fihai8tf1hm|n6lyi8tfpav-hecui88fa6s-jejmi8tfutk|jejqi8tfphx|g2kmi86fc3p:jik2i8tfqcw|jejui8tfpgx|fihei8tfggz|emlai8bf84n=ealei8bf48n=jqkei84fi3s:jejyi9tfpav\\fmhei9tf3rk|fmhyi9tf7jv|fmhqi9tf1ho|kie6i9gfu6l*kahei9bfwrl=fmhii96f1hm:fmhmi9tf1in|cqm6i9nf4dsAnam6i9kfvesxdqlmi99f75o=fqkui9bfb2l=fmhuiatf2iq|fudiia4b65l:g2deiakf83kxkmeeiagfu6l*fikyiaaf75n=h2d2iajf93mxcqmaiaif4gsxnamaiaqfvgsAeyl6iadf84n+cqmeiamf3hsanameiadfwhs+cqmiiaof3isAnamiiaffwis*cqmmiasf3is#nammiarfwis#cqmqiakf3isxnamqiaffwis*cqmuiabf3is=namuiagfwis*cqmyiakf3isxnamyiacfwis+cqn2iamf3isanan2iaqfwis#cqn6iakf3isxnan6iaefwis+cqnaiapf3isAnanaiaifwisxcqneiaif3isxnaneiaifwisxcqniiaqf3isAnaniiaffwis*cqnmiaif3isxnanmia9fwis=cqnqiaef3is+nanqia7fwis-cqnuiadf3is+nanuia6fwis-cqnyia8f3is-nanyia9fwis=cqo2ia6f3is:nao2iaufwis%cqo6ia6f3is:nao6iaqfwis#cqoaia8f3is-naoaiatfwis#cqoeia9f3is=naoeiagfwis*cqoiiaqf3isAnaoiiaifwisxcqomiadf3is+naomiabfwis=jukiibtfn8v\\gekaibbfc4s=fykqibsf84n#cylyibrfc2m#gik6ibkf68rajik6ibtfu9r|hicuib8fc3q-jajqib9fvtk=gqjuib8f4tj-d6luibcf94p+jykmictfo8u\\hacyicgf84o*kedyicjfv7lxjajuicbfufu=e2liicbf94n=n2lyic9ftct=cum2ichf78r*n6m2icafs9s=malmicufo6t-kakuiczfo6t\\gmk2idaf68r=jek2id9fs9s=gqjyidaf5bs=jajyidbftbt=fal2idof93nAk2kqid7fo7t-muluidtfn8v-hmcuidgfc6u*l2l6idzfo5r-dilqiekf84oxeeleieef93n+cum6ietf5et#n6m6ielfuetajqkiie5fm4s:fqdmie2b56m.dulmiedf93o+lyliietfo6t-eqlaiegf93n*fidyiejf47mxgikaifkf78sxcumaifjf5guxn6maifnfuguAcumeifif5huxn6meiflfuhuacumiiftf5iu#n6miifofuiuAcummifqf5iu#n6mmifrfuiu#cumqifof5iuAn6mqiflfuiuacumuifff5iu*n6muifcfuiu+cumyifsf5iu#n6myifjfuiuxcun2ifpf5iuAn6n2ififuiuxcun6ifjf5iuxn6n6ifcfuiu+cunaifmf5iuan6naifffuiu*cuneiflf5iuan6neifbfuiu=cuniifof5iuAn6niifdfuiu+cunmifff5iu*n6nmifafuiu=cunqifbf5iu=n6nqifdfuiu+cunuifmf5iuan6nuifgfuiu*cunyifef5iu+n6nyifafuiu=cuo2ifif5iuxn6o2if9fuiu=cuo6ifhf5iu*n6o6if6fuiu-cuoaifif5iuxn6oaif6fuiu-cuoeifsf5iu#n6oeif7fuiu-cuoiif9f5iu=n6oiifafuiu=cuomif5f5iu:n6omifpfuiuAd2lyifdfa4q+daluifcfc2n+fqhyiftf2pl/jikaiftfn6t|hqcuifgfd7v*gekeiftfc9w\\gmk6ifcf69s+jek6iflfs9sacym2iflf88tan2m2ifcfs9t+k6dmigkfu7mxmylyigdfscu+milqigtfl7v-hucuigefg7v+jukmig9fq5r=kql2igzfn6t-j6juig9fvtk=lmleigxfo6t-gqk2igaf88t=jak2igbfr9t=hycuigjfh7vxmqluihafrbu=m6lmih9fs8s=g2kqihtfc3p|fukuihnf93nak6kuih8fs8s-gujyih8f5tk-hecyihffb3o*j6jyihaftcu=fmkyihkfb2nae6liiijfc1mxjykqii9fq5q-cym6iimf7dvan2m6iiofsdvAlalaiitfm6u-f2l6iiffb2m*dmlqiipfd2nAmelqii9fp8u=cymaiisf7hv#n2maiiufshv%cymeiiif7hvxn2meiiifshvxcymiiigf7iv*n2miiinfsivAcymmiiof7ivAn2mmiijfsivxcymqiisf7iv#n2mqiikfsivxcymuiicf7iv+n2muiiifsivxcymyiiuf7iv%n2myiiqfsiv#cyn2iimf7ivan2n2iilfsivacyn6iicf7iv+n2n6iihfsiv*cynaiimf7ivan2naiidfsiv+cyneiief7iv+n2neiiefsiv+cyniiiif7ivxn2niiiffsiv+cynmiiff7iv*n2nmiicfsiv+cynqiief7iv+n2nqiidfsiv+cynuiief7iv+n2nuiiafsiv=cynyiiaf7iv=n2nyiigfsiv*cyo2iidf7iv+n2o2iibfsiv=cyo6iibf7iv=n2o6iicfsiv=cyoaiidf7iv+n2oaiibfsiv=cyoeiicf7iv+n2oeii9fsiv=cyoiiidf7iv+n2oiii9fsiv-cyomiiaf7iv=n2omii6fsiv-kekyiitfm6u\\luliij9fs8t=d6lyijlfa5ramulyijsfp6s#jqkmijtfl4s|gikeijlf97sakyl6ijtfs8s-gmkaijlf78tajekaijtfr8t|d2m2ijef89u+mym2ijsfrau#gqk6ijbf89t=jak6ijdfr9t+deluijcfc3p+mmluijrfqav#kueyijefu6m+eileijpfc2mAfel2ijkfc2nxjikeikzfm9w|h6d2ikhfb2m*hicyikkfe2pxguk2ikaf8au=dylmikmfb2oam2lmikafq9u=j6k2ikbfrau=kml2iktfr8t-lileikafr9t=dqlqikefc2p+malqiklfn3qafykuikqfb3p#k2kuikafp4q=j2jyilafuuk=hmcyiljff2qxd2m6ilif8ewxmym6ilpfrewAeulailhfb2n*l6lailbfq7t=fqkyilefc2o+kakyil9fn3p=dalyilffb5s*mqlyilsfp7t#gud6ilff92k*d2mailof8hwAmymailsfrhw#jukqil9fp5r=d2meiluf8hw%mymeilqfrhwAd2miiltf8iw#mymiilrfriw#d2mmilgf8iw*mymmilpfriwAd2mqiltf8iw#mymqilmfriwad2muilkf8iwxmymuilmfriwad2myilpf8iwAmymyilifriwxd2n2ilhf8iw*myn2ilhfriw*d2n6ilhf8iw*myn6ildfriw+d2nailuf8iw%mynailefriw+d2neilqf8iwAmyneilcfriw=d2niilmf8iwamyniilhfriw*d2nmilef8iw+mynmilafriw=d2nqiljf8iwxmynqilcfriw=d2nuilkf8iwxmynuilafriw=d2nyildf8iw+mynyilefriw+d2o2iljf8iwxmyo2ilcfriw+d2o6ilbf8iw=myo6ilbfriw=d2oaillf8iwamyoailbfriw=d2oeilbf8iw=myoeil9friw=d2oiilcf8iw=myoiilafriw=d2omilbf8iw=myomilafriw=ealiilpfc2oAlqliilafq9u=diluimofd4rAmiluimhfn5s*hqcyimjfg2qxd6m2imgf9av*mum2imkfqavxf6l6impfd2oAkul6im9fq8u-gqkaimdf99u+jakaimjfq9uxguk6imcf9av=j6k6imcfqav+jekeimtfp8u|gmkeimlf98tae2lmimefc3p+lylmimtfn3q%hucyimjfg2qxj2k2imcfqbw+gyk2im8ffym-fil2imlfd2oagikiincfe6u+had2indfd1n+hycyin4bg3r:emleintfd2o#lelein9fq9u=d6m6inlf9ewamum6intfqew%kil2in8fq9u-dulqinkfc3qxm6lqinffn4r*d6mainhf9hx*mumaintfqhx#g2kuintfe3r|d6omindf9ix+muominafqix=d6meinlf9hxamumeinnfqhxad6miinrf9ix#mumiinefqix+d6mminvf9ix%mumminnfqixad6mqinuf9ix%mumqinhfqix*d6muingf9ix*mumuinlfqixad6myinlf9ixamumyincfqix+d6n2injf9ixxmun2incfqix+d6n6inkf9ixxmun6inbfqix=d6nainpf9ixAmunainjfqixxd6neindf9ix+muneinefqix+d6niinjf9ixxmuniinbfqix=d6nminpf9ixAmunmindfqix+d6nqinuf9ix%munqinefqix+d6nuintf9ix#munuincfqix+d6nyinjf9ixxmunyinbfqix=d6o2ingf9ix*muo2inefqix+d6o6inkf9ixxmuo6indfqix+d6oainhf9ix*muoainbfqix=d6oeinff9ix*muoeinbfqix=d6oiincf9ix+muoiinafqix=delyinpfa7uAmmlyintfp7u#dmluiocfc5s+meluiosfn5s#jqkqiotfl4t|i2cyiohfg6v*eeliioefc3p+lmliiorfn4q#jykuiocfo4r+eylaiobfd2o=l2laioafn3p=dam2ionfaavamqm2ioofpavAgyk6ioafbaw=j2k6iocfoaw+fal6iokfd2pxkql6iobfn3q=fukyiolfb4qak6kyioefo4q+iyk2ioafkym=gukaiodfa9v+j6kaioffp9v*h2k2io8f5uk-gqkeiplfa9vajakeipkfp9vxe6lmiphfc4r*lulmipqfn4rAfqhuiptf1ol\\gmkiipkfa8uxjekiip5fl7v:dylqipqfc4sAm2lqipqfn4sAdam6ipmfafxamqm6ipsfpfx#eqleipffd2p*laleipjfn3qxfml2ipifc3qxkel2ipafm3r=damaiqofahxAmqmaiqpfphxAdameiqmfahxamqmeiqufphx%damiiqpfaixAmqmiiqpfpixAdammiqqfaixAmqmmiqpfpixAdamqiqsfaix#mqmqiqpfpixAdamuiqdfaix+mqmuiqifpixxdamyiqpfaixAmqmyiqrfpix#dan2iqsfaix#mqn2iqnfpixAdan6iqofaixAmqn6iqdfpix+danaiqlfaixamqnaiqgfpix*daneiqqfaixAmqneiqffpix*daniiqkfaixxmqniiqcfpix+danmiqhfaix*mqnmiqefpix+danqiqifaixxmqnqiqdfpix+danuiqefaix+mqnuiqffpix*danyiqcfaix+mqnyiqdfpix+dao2iqdfaix+mqo2iqbfpix=dao6iqjfaixxmqo6iqcfpix+daoaiqhfaix*mqoaiqffpix*daoeiqofaixAmqoeiqdfpix+daoiiqafaix=mqoiiqdfpix+daomiqcfaix+mqomiqafpix=dilyiqrfb7u#milyiqufo7u%hed2iqgfe1o*h2k6iq8fcbx-iyk6iqbfnbx=dqluiqgfb5s*maluiqmfo5sagyd6iq7be1l-kuf2iqafxbn=f2laiqmfd3qakylaiqdfm3q+dem2iqsfabw#mmm2iqrfpbw#jukuiqafn5s=gykaiqbfbaw=j2kaiqdfoaw+gikmiqtfeax\\fykyiqrfd4r#k2kyiqafn4r=iuk2iq8fuuk-eiliirufc4r%liliirlfn4sagukeirffb9w*j6keirlfo9waealmircfc5s+lqlmirqfn5sAhid2irfff1o*fel6irifc3qxkml6irifn4rxiuk6irafndx=dem6irrfafx#mmm6irqfpfx#h6k6ir7fgzl-gqkiirnfb9vajakiirtfo9v/fql2ircfd4r+kal2irmfm4rademairpfahxAmmmairqfphxAdemeirsfahx#mmmeirsfphx#demiirpfaixAmmmiirsfpix#demmirhfaix*mmmmirlfpixademqirqfaixAmmmqirofpixAdemuirqfaixAmmmuirrfpix#demyirffaix*mmmyirufpix%den2irtfaix#mmn2irkfpixxden6irffaix*mmn6irdfpix+denairefaix+mmnairhfpix*deneirlfaixammneirffpix*deniirkfaixxmmniirgfpix*denmirifaixxmmnmirhfpix*denqirjfaixxmmnqirgfpix*denuirafaix=mmnuircfpix+denyirhfaix*mmnyirbfpix=deo2irffaix*mmo2ircfpix+deo6irhfaix*mmo6irafpix=deoairifaixxmmoairbfpix=deoeirafaix=mmoeirafpix=deoiirafaix=mmoiir9fpix=deomirffaix*mmomirafpix=f2f2irkf1ioxe2lqisqfc5sAlylqistfn5s#h2kais9fdax=iykaiscfmbx+dmlyistfb8v%melyisffo8v*gmkmisgfc8v*euleisgfc4r*l6leistfn4r#duluistfc6u#m6luistfn6u%f6laismfd4rakulaisbfm4r=jqkuiszfk5t|dim2isdfbcx+mim2isvfocx%g2kyistff4t|gykeisdfcaw+j2keisffnaw*jekmiszfkby/emliisifc5sxleliismfn5sahmd2ishfg1o*iqk6it8fjzl-gidaitbf92k=h6kait8fdbx-iukaitcfmbx=fil6itmfd4rakil6itsfm4s#jykyitcfn5s=hak6ittfgzk\\hyd2itkfh1oxdim6itqfbfyAmim6itqfofy#gukiitmfc9waj6kiitkfn9wxeelmitffc5t*lmlmitjfn5txdimaitlfbhyamimaitufohy%dimeitqfbhyAmimeitlfohyadimiittfbiy#mimiitnfoiyadimmittfbiy%mimmitkfoiyxdimqitofbiyAmimqitcfoiy+dimuithfbiy*mimuitkfoiyxdimyitufbiy%mimyitefoiy+din2itqfbiyAmin2itsfoiy#din6itffbiy*min6itkfoiyxdinaitofbiyAminaithfoiy*dineitsfbiy#mineitbfoiy=diniitifbiyxminiitmfoiyadinmitffbiy+minmitcfoiy=dinqitkfbiyxminqitefoiy+dinuithfbiy*minuitcfoiy+dinyitdfbiy+minyitefoiy+dio2itffbiy+mio2itafoiy=dio6itlfbiyamio6itafoiy=dioaitmfbiyamioaitbfoiy=dioeitdfbiy+mioeitbfoiy=dioiitdfbiy+mioiitbfoiy=diomitbfbiy=miomitcfoiy+k2ieitgfylo*fuieitgf2lo*kufait2byho.hqd2itifg1oxdqlyitlfc8vamalyitefn8v+kufqit2byfo.f2fqitjf1foxh2keitbfdax=iykeitefmax+e6lqitjfc6txlulqitsfn6t#kuf6it3byfn.eyleiuufd4s%l2leiuffm4s*ful2iurfc5s#k6l2iuafn5s=jakmiu7fn9w-hakaiu8fedy-iqkaiuaflcy=dmm2iumfbcxamem2iuofocxAh2d6iu4bf1l:gqkmiunfc9wadyluiulfc6uam2luiutfn6u%hud2iujfi1oxfeguiubf4sm=kufeiu4byfo:hek6iu5f5uj:falaiusfc4s#kqlaiunfn4sagykiiuhfdax*j2kiiumfmaxaimk6iu8fjzk-f2feiujf1goxh6keiu9febx=iukeiudflbx+dmm6iunfcgyamem6iuqfngyAeqliiuafc5t=laliiuofn5tAgmkqiutfecy\\hekaiu7fdey-i2d2ivbfg1o=imkaiv8fmfy-dmmaivtfchy#memaivufnhy%dmmeivofchyAmemeivnfnhyadmmiivffciy*memiivnfniyadmmmivqfciyAmemmivnfniyAdmmqivufciy%memqivofniyAdmmuivgfciy*memuivpfniyAdmmyivtfciy#memyivifniyxdmn2ivsfciy#men2ivmfniyadmn6ivifciyxmen6ivnfniyadmnaivkfciyxmenaivhfniy*dmneivgfciy*meneivnfniyadmniivsfciy#meniivlfniyadmnmivifciyxmenmivbfniy=dmnqivofciyAmenqivdfniy+dmnuivmfciyamenuivafniy=dmnyivnfciyamenyivdfniy+dmo2ivffciy*meo2ivdfniy+dmo6ivdfciy+meo6ivdfniy+dmoaivjfciyxmeoaivbfniy=dmoeivrfciy#meoeivafniy=dmoiivffciy*meoiivdfniy+dmomivlfciyameomivafniy=jukyivafm5t=fml6ivmfc5sakel6ivmfn5safqhqivgf1ll*i6d2iv4bg4s:eilmivffc6u*lilmivpfn6uAdulyivjfc9wxm6lyivofn9wAgukmivnfdawAj6kmivlfmawahakeiv8ffby-iqkeivbfkby=dqm2ivmfcdxamam2ivhfndx*ealqivlfc6ualqlqivtfn6u#kufmiv2byjo.f2fmiv5b1jo:h2kiivdfeax+iykiiviflaxxe2luivpfc7vAlyluivqfn7vAfih2iv7f9xk-fmduiv5b4ap:kaduivhfvap*fyl2iwgfd5t*k2l2iwkfm5txiik6iw8fuuk-f2leiwofc5tAkyleiwhfn5t*hekeiw8ffcy-imkeiwafkcy=hikaiwtfhzk\\iikaiw8fmgy-kufiiw4byho:f2fiiw7f1ho-iad2iwtfg4t\\dqm6iwpfcgyAmam6iwtfngy%kqeqiw4bv7k:f6eqiwkf3bpxjakqiwtfkdy/k6hqiwtfyko|dqmaiwnfchyamamaiwrfnhy#dqmeiwufchy%mameiwrfnhy#dqmiiwdfciy+mamiiwhfniy*dqmmiwsfciy#mammiwufniy%dqmqiwjfciyxmamqiwmfniyadqmuiwifciyxmamuiwsfniy#dqmyiwgfciy*mamyiwpfniyAdqn2iwtfciy%man2iwpfniyAdqn6iwsfciy#man6iwpfniyAdqnaiwrfciy#manaiwefniy+dqneiwrfciy#maneiwofniyAdqniiwefciy+maniiwjfniyxdqnmiwlfciyamanmiwkfniyxdqnqiwkfciyxmanqiwbfniy=dqnuiwjfciyxmanuiwbfniy=dqnyiwifciyxmanyiwafniy=dqo2iwmfciyamao2iwbfniy=dqo6iwcfciy+mao6iwbfniy=dqoaiwdfciy+maoaiw9fniy=dqoeiwcfciy=maoeiwbfniy=dqoiiwnfciyamaoiiwbfniy=dqomiwffciy*maomiw9fniy=gqkqiwtfd9w\\jqkyiwtfk6u|h6kiiwbffbx=iukiiwefkbx+felaiwpfd5tAkmlaiwffm5t*gykmiwmfeaxaj2kmiwmflaxahikeiw7ffey-iikeiw9fkey-euliiwtfc6u#l6liiwefn6u+dylyiwhfdax*m2lyiwofmaxAdum2iwvfcdy%m6m2iwufndy%emlmixffd6u*lelmixefm6u+fql6ixefd5t+kal6ixefm5t+hakiixaffby=iqkiixefkby+eelqixrfd7v#lmlqixmfm7vaiekaix9fizl=g2l2ix5fg5u:e6luixkfd8wxluluixtfm8w%hmkaixtfhzk-hmkeix7fegz-iekeix8flfz-f2g6ix2b3rk.kmeiix5bw8k:h2kmixlfebxaiykmixmflbxadum6ixlfcgyam6m6ixsfngy#hekiix9fgcy=imkiixdfjcy+jyl2ixdfm6u+j6kqix9fmax=gukqixofeaxAdumaixofdhyAm6maixufmhy%dumeixofdhyAm6meixjfmhyxdumiixkfdiyxm6miixhfmiy*dummixofdiyAm6mmixgfmiy*dumqixsfdiy#m6mqixrfmiy#dumuixlfdiyam6muixkfmiyxdumyixrfdiy#m6myixcfmiy=dun2ixvfdiy%m6n2ixgfmiy*dun6ixpfdiyAm6n6ixsfmiy#dunaixofdiyAm6naixjfmiyxduneixofdiyAm6neixpfmiyAduniixlfdiyam6niixrfmiy#dunmixpfdiyAm6nmixcfmiy+dunqixjfdiyxm6nqixdfmiy+dunuixlfdiyam6nuixgfmiy*dunyixlfdiyam6nyixafmiy=duo2ixhfdiy*m6o2ixbfmiy=duo6ixefdiy+m6o6ixlfmiyaduoaixhfdiy*m6oaixcfmiy+duoeixbfdiy=m6oeixafmiy=duoiixgfdiy*m6oiixffmiy*duomixcfdiy+m6omixafmiy=f6leixqfd5t#kuleixsfm5t#h6d6ix5be1l:hikiix8fgcy-iikiixafjcy=fie2iyjfa3mxkee2iyffw8k*hqkaiytfhzk-iakaiy8fizk-k2iaiytfvqo|e2lyiymfdbxalylyiyifmbxxkieaiybfv7k=hqkeiy7ffhz-iakeiy8fkhz-fuiaiytf1lk/dym2iyqfdey#m2m2iyofmeyAhmkiiy7fgdy-iekiiy9fjdy=h6kmiyeffby+iukmiymfkbyafilaiygfd5t*kilaiylfm5taeyliiyufd6u%l2liiydfm6u+hqkiiy7fgez-iakiiy8fjez-eqlmiyvfd7v%lalmiyofm7vAealuiynfd9walqluiyqfm9wAkufuiy2bxcn.f2fuiycf2cn+eilqiyrfd8w#lilqiyofm8wAful6iyqfd6uAk6l6iyefm6u+gykqiynfeaxaj2kqiymflaxahukaiytfhzk-i6kaiytfizk/hukeiy8fghz-i6keiy8fjhz-gqkuiy6ffdy-dym6iylfdgyam2m6iymfmgyahakmiyafgby=iqkmiyffjby+hukiiy8fgfz-i6kiiy7fjfz-dymaiydfdhy+m2maiylfmhyadymeiyufdhy%m2meiygfmhy*dymiiyifdiyxm2miiyefmiy+dymmiymfdiyam2mmiyifmiyxdymqiysfdiy#m2mqiyhfmiy*dymuiymfdiyam2muiypfmiyAdymyiyqfdiyAm2myiyqfmiyAdyn2iyqfdiyAm2n2iykfmiyxdyn6iydfdiy+m2n6iymfmiyadynaiyrfdiy#m2naiyifmiyxdyneiyofdiyAm2neiyqfmiy#dyniiylfdiyam2niiynfmiyadynmiyofdiyAm2nmiykfmiyxdynqiypfdiyAm2nqiyofmiyAdynuiyjfdiyxm2nuiyafmiy=dynyiyqfdiyAm2nyiycfmiy+dyo2iyofdiyAm2o2iyffmiy*dyo6iykfdiyxm2o6iycfmiy+dyoaiyofdiyAm2oaiydfmiy+dyoeiyifdiyxm2oeiy9fmiy=dyoiiyqfdiyAm2oiiyafmiy=dyomiyjfdiyxm2omiyafmiy=hykaiytfhzk-i2kaiytfizk-hykeiy7fhhz-i2keiy7fihz-jul2iybfl6v=hykiiz9fhgz-i2kiiz7figz-gmdaizhfe1k*hekmiz9fgby=imkmizdfjby+e6lyizrfdbx#lulyizpfmbxAe2m2izofdeyAlym2izlfmeyah2kqizmffbxaiykqizofkbxAf6giiz2b3rk.g6deizkf83kxfaleizlfd6uakqleizrfm6u#hikmiz9fhcy-iikmizbficy=k6hmiztfxno|hmkmiz8fhcy-iekmiz8ficy-j6kuiztfjdy/hqkmiz7fhcy-iakmiz9ficy-fqhmiztf1lk|fmlaizcfd6u=kelaizffm6u*eeluiznfdaxalmluizufmax%gukuiztfeax\\hukmiz7fhdy-i6kmiz9fidy-e2m6iznfdgyalym6izufmgy%hykmiz7fhdy-i2kmiz8fidy-f2liizvfd7v%kyliizqfm7v#emlqizrfd9w#lelqizjfm9wxeulmizvfd8w%l6lmiztfm8w#jql2izzfj7v|h6kqizlfgbyaiukqizlfjbyae2maizqfdhyAlymaizkfmhyxe2meiztfdhy%lymeizrfmhy#e2miizlfdiyalymiizsfmiy#e2mmizffdiy*lymmiznfmiyae2mqizifdiyxlymqizjfmiyxe2muizrfdiy#lymuizmfmiyae2myizqfdiy#lymyizufmiy%e2n2izvfdiy%lyn2izofmiyAe2n6izifdiyxlyn6izofmiyAe2naizpfdiyAlynaizgfmiy*e2neizgfdiy*lyneizkfmiyxe2niizpfdiyAlyniizrfmiy#e2nmiznfdiyalynmiznfmiyae2nqizrfdiy#lynqizbfmiy=e2nuizlfdiyalynuizjfmiyxe2nyizhfdiy*lynyizefmiy+e2o2izlfdiyalyo2izbfmiy=e2o6izrfdiy#lyo6izdfmiy+e2oaizffdiy*lyoaizbfmiy=e2oeizefdiy+lyoeiz9fmiy=e2oiizkfdiyxlyoiizafmiy=e2omizdfdiy+lyomizafmiy=fyl6izbfe6u=k2l6izbfl6u=kahaj0tfpxl|fqdqj0kfb2mxk6dqj05bo2m:fmhaj0cf4sk+hakqj0kfgbyxiqkqj0mfjbyaealyj0hfdcy*lqlyj0rfmcy#e6m2j0pfdeyAlum2j0lfmeyaj2kuj0afkbx=gykuj0nffaxahekqj0ifgbyximkqj0mfjbyahad6j03bf1m:felej0sfd7v#kmlej0qfm7v#e6m6j0jfegzxlum6j0tflgz%eiluj0lfebxaliluj0tflbx%g2l6j07fg7v-hikqj0afhcy=iikqj0jficyxe6maj0mfehzalumaj0iflhzxe6mej0vfehz%lumej0tflhz#e6mij0ufeiz%lumij0cfliz+e6mmj0ifeizxlummj0oflizAe6mqj0jfeizxlumqj0mflizae6muj0tfeiz#lumuj0lflizae6myj0nfeizalumyj0rfliz#e6n2j0qfeizAlun2j0oflizAe6n6j0kfeizxlun6j0oflizAe6naj0sfeiz#lunaj0qflizAe6nej0hfeiz*lunej0kflizxe6nij0cfeiz+lunij0hfliz*e6nmj0ufeiz%lunmj0gfliz*e6nqj0ufeiz%lunqj0gfliz*e6nuj0jfeizxlunuj0dfliz+e6nyj0tfeiz%lunyj0rfliz#e6o2j0qfeizAluo2j0hfliz*e6o6j0kfeizxluo6j0kflizxe6oaj0kfeizxluoaj0efliz+e6oej0gfeiz*luoej0afliz=e6oij0dfeiz+luoij0bfliz=e6omj0bfeiz=luomj0bfliz=eqlqj04feax:lalqj0oflaxAfqlaj0jfe7vxkalaj0gfl7v*hmkqj0afhcy=iekqj0cficy+jadaj0kfk1nxeylmj0ufd9w%l2lmj0vfm9w%hqkqj18fhcy-iakqj19ficy=jyl6j1efl7v+fyimj1tf4oq|hukqj17fhcy-i6kqj17ficy-f6lij1tfd8w%kulij1mfm8wah2kuj1nfgbxaiykuj1nfkbyahykqj18fhcy-i2kqj18ficy-eam2j1pfefyAlqm2j1mflfyaeelyj1rfedy#lmlyj1jfldyxh6kuj1mfgbyaiukuj1mfjbyagukyj1tfgey\\eam6j1mfehzalqm6j1oflhzAeamaj1qfehzAlqmaj1oflhzAeamej1kfehzxlqmej1gflhz*eamij1pfeizAlqmij1gfliz*eammj1rfeiz#lqmmj1oflizAeamqj1mfeizalqmqj1vfliz%eamuj1sfeiz#lqmuj1tfliz#eamyj1gfeiz*lqmyj1jflizxean2j1ffeiz*lqn2j1rfliz#ean6j1jfeizxlqn6j1rfliz#eanaj1efeiz+lqnaj1rfliz#eanej1lfeizalqnej1iflizxeanij1ofeizAlqnij1hfliz*eanmj1rfeiz#lqnmj1qflizAeanqj1nfeizalqnqj1iflizxeanuj1dfeiz+lqnuj1dfliz+eanyj1ffeiz*lqnyj1ffliz*eao2j1dfeiz+lqo2j1lflizaeao6j1nfeizalqo6j1mflizaeaoaj1nfeizalqoaj1cfliz+eaoej1gfeiz*lqoej1cfliz+eaoij1kfeizxlqoij1ffliz*eaomj1ufeiz%lqomj1afliz=emluj1ofebxAleluj1tflbx#hakuj1mfgbyaiqkuj1mfjbyafilej1rfe7v#kilej1ifl7vxfydij1kf64kxjydij1ifs6pxeulqj15febx:l6lqj1vflbx%jul6j1kfk8wxfulaj1jfe7vxk6laj1bfl7v=f2lmj2ofeaxAkylmj2uflax%eem2j2hfefy*lmm2j2jflfyxhekuj2kfhbyximkuj2ofibyAj2kyj2zfjez/eilyj2ufedy%lilyj2mfldyafalij2sfe9w#kqlij2ifl9wxf2g2j27b0jk-kufyj2hfyen*f2fyj22b1fn.hikuj2ifhcyxiikuj2oficyAgykyj2tffbx\\hmkuj2ifhcyxiekuj2jficyxeem6j2efehz+lmm6j2fflhz*hqkuj2ifhcyxiakuj2ificyxhukuj2hfhcy*i6kuj2hficy*hykuj2gfhcy*i2kuj2gficy*eemaj29fehz=lmmaj2fflhz*eemej2afehz=lmmej2oflhzAeemij2tfeiz#lmmij2mflizaeemmj2vfeiz%lmmmj2kflizxeemqj2nfeizalmmqj2rfliz#eemuj2sfeiz#lmmuj2lflizaeemyj2mfeizalmmyj2ufliz%een2j2ofeizAlmn2j2mflizaeen6j2mfeizalmn6j2sfliz#eenaj2tfeiz#lmnaj2nflizAeenej2ifeizxlmnej2jflizxeenij2hfeiz*lmnij2nflizaeenmj2ufeiz%lmnmj2nflizaeenqj2pfeizAlmnqj2ufliz%eenuj2ofeizAlmnuj2ffliz+eenyj2qfeiz#lmnyj2mflizaeeo2j2qfeizAlmo2j2dfliz+eeo6j2lfeizalmo6j2bfliz=eeoaj2dfeiz+lmoaj2efliz+eeoej2cfeiz+lmoej2bfliz=eeoij2cfehz=lmoij2eflhz+eeomj2bfehz=lmomj2cflhz+eqluj2ufecy%laluj2mflcyajql6j2tfj8w|hed6j27bg1m-iykyj2tfkby/h2kyj2ofgbyAeylqj2vfeby%l2lqj26flby:g2iuj2tf3oq\\eim2j2mfefzalim2j2qflfzAfmlej2ife8wxkelej2ffl8w*emlyj2mfeeyalelyj2ufley%fylaj2rff8w#k2laj2ffl8w*kqeuj2afydk=f6euj2jf57oxf6lmj2gfebx*kulmj2lflbxah6kyj3mfgbyaiukyj3tfjby/eim6j3vfehz%lim6j3rflhz#felij3sfeax#kmlij3pflaxAfmdyj3kf2blxkadyj33bybl:eimaj3ufehz%limaj3oflhzAeimej3vfehz%limej3uflhz%eimij3mfeizalimij3mflizaeimmj38feiz-limmj3rfliz#eimqj39feiz=limqj3pflizAeimuj3bfeiz=limuj3kflizxeimyj3jfeizxlimyj3jflizxein2j3sfeiz#lin2j3iflizxein6j3ifeizxlin6j3pflizAeinaj3sfeiz#linaj3iflizxeinej3ufeiz%linej3mflizaeinij3lfeizalinij3iflizxeinmj3tfeiz#linmj3pflizAeinqj3ffeiz+linqj3kflizxeinuj3bfeiz=linuj3oflizAeinyj3cfeiz+linyj3efliz+eio2j3kfeizxlio2j3ffliz*eio6j3mfeizalio6j3nflizaeioaj3qfeizAlioaj3dfliz+eioej3ffeiz*lioej3gfliz*eioij3lfeizalioij3iflizxeiomj3cfeiz+liomj3afliz=euluj3vfedy%l6luj3rfldy#hakyj3mfhbyaiqkyj3mfibyakug2j3kfyhnxk6hij3tfvro/hekyj3jfhbyximkyj3mfibyaemm2j3dffgz+lem2j3nfkgzag2laj37fg8w-kmemj3afydk=f2lqj3vfecy%kylqj38flcy-eqlyj3offeyAlalyj3ufkey%kee6j35byck:hikyj3kfhcyxiikyj3ificyxfqhij3tf1mk|hmkyj3kfhcyxiekyj3jficyxjylaj3cfk8w+hqkyj3jfhcyxiakyj3jficyxfqlej3dfe9w+kalej3cfl9w+emm6j3vffhz%lem6j3ofkhzAhukyj3mfhcyai6kyj3lficyahykyj3kfhcyxi2kyj3kficyxfalmj3ufecy%kqlmj3lflcyagyl2j36fhez-emmaj3gffhz*lemaj3afkhz=emmej3qffhzAlemej3cfkhz+emmij3rffiz#lemij3tfkiz#emmmj3sffiz#lemmj3tfkiz#emmqj3offizAlemqj3vfkiz%emmuj3uffiz%lemuj3sfkiz#emmyj3uffiz%lemyj3sfkiz#emn2j39ffiz-len2j3mfkizaemn6j38ffiz-len6j3lfkizaemnaj3pffizAlenaj3ofkizAemnej3pffizAlenej3ufkiz%emnij3mffizalenij3qfkizAemnmj3nffizalenmj3qfkizAemnqj3sffiz#lenqj3tfkiz#emnuj3pffizAlenuj3ifkizxemnyj3qffiz#lenyj3lfkizaemo2j3qffiz#leo2j3efkiz+emo6j3nffizaleo6j3lfkizaemoaj3jffizxleoaj3ifkizxemoej3jffizxleoej3mfkizaemoij3cffiz+leoij3hfkiz*emomj3effiz+leomj3afkiz=ied6j3kfj1oxfudmj3kf65kxk2dmj32bydl.filij4dfebx+kilij4gflbx*eyluj47ffdy-l2luj4vfkdy%hid6j48fg1m-iyl2j4zfiez/eqm2j4nffgzAlam2j4ufkgz%eulyj4pffezAl6lyj4kfkezxkieej47fyck-h2l2j4cfgby+f6lqj4lffdyakulqj4vfkdy%eqm6j4pffhzAlam6j4ofkhzAjulaj4gfk9x*eqmaj4lffhzalamaj4ofkhzAeqmej4rffhz#lamej4vfkhz%eqmij4tffiz%lamij4kfkizxeqmmj4fffiz*lammj4pfkizAeqmqj4pffizAlamqj48fkiz-eqmuj4lffizalamuj48fkiz-eqmyj4uffiz%lamyj4jfkizxeqn2j4tffiz#lan2j4sfkiz#eqn6j4pffizAlan6j4rfkiz#eqnaj4uffiz%lanaj4qfkizAeqnej4nffizalanej4nfkizaeqnij48ffiz-lanij4tfkiz%eqnmj49ffiz-lanmj4nfkizaeqnqj4uffiz%lanqj4nfkizaeqnuj4iffizxlanuj4gfkiz*eqnyj4qffizAlanyj4mfkizaeqo2j4lffizalao2j4pfkizAeqo6j4jffizxlao6j4lfkizaeqoaj4rffiz#laoaj4ffkiz*eqoej4rffiz#laoej4ifkizxeqoij4gffiz*laoij4qfkizAeqomj4iffizxlaomj4ffkiz*iul2j4afjcy=felmj4cffcy+kmlmj4ofkcyAfulej4kffaxxk6lej4cfkax=h6l2j4lfgbyak2i6j4tfurp|faemj4tf3bp/fie6j4hf75o*f2luj44ffey:kyluj4vfkey%fui6j4tf1lk|eum2j4uffgz%l6m2j4cfkgz+fmlij4gfeby*kelij4qflbyAhal2j4nfhbyaiql2j4tficy/eylyj4vfffz%l2lyj4kfkfzxjqlaj46fi9x:eum6j4qffhzAl6m6j4ufkhz%hel2j4mfhcyaiml2j4jficyxfalqj5offdyAkqlqj5vfkdy%eumaj5sffhz#l6maj5hfkhz*euomj5rffiz#l6omj5bfkiz=eumej5hffhz*l6mej5ufkhz%eumij5uffiz%l6mij5nfkizAeummj5pffizAl6mmj5pfkizAeumqj5nffizal6mqj5ufkiz%eumuj5pffizAl6muj5ufkiz%eumyj5mffizal6myj5vfkiz%eun2j5offizAl6n2j5afkiz=eun6j5uffiz%l6n6j58fkiz-eunaj5vffiz%l6naj58fkiz-eunej5tffiz%l6nej5efkiz+eunij5uffiz%l6nij5kfkizxeunmj5uffiz%l6nmj5ufkiz%eunqj5bffiz=l6nqj5pfkizAeunuj58ffiz-l6nuj5jfkizxeunyj59ffiz=l6nyj5pfkizAeuo2j5sffiz#l6o2j5sfkiz#euo6j5kffizal6o6j5dfkiz+euoaj5offizAl6oaj5kfkizxeuoej5gffiz*l6oej5gfkiz*euoij5rffiz#l6oij5mfkizahil2j5ifhcyxiil2j5kficyxhml2j5jfhcyxiel2j5ificyxhql2j5kfhcyxial2j5kficyxj6daj5jfn2nxgqdaj56be0k-hul2j5ifhcyxi6l2j5jficyxf6gej53b1mk:hyl2j5jfhcyxi2l2j5ificyxiad6j55bj1m:hmd6j5hfh1m*filmj5nffdyakilmj5jfkdyxf6luj5iffeyxkuluj56fkey:fylej5tffax%k2lej5afkax=eym2j5nffgzal2m2j5ffkgz*f2lyj5vfffz%kylyj5ofkfzAfqlij5gffcy*kalij5gfkcy*eym6j5rffhz#l2m6j5ufkhz%eymaj5tffhz#l2maj5jfkhzxeymej5effhz+l2mej5kfkhzaeymij5nffizAl2mij5tfkiz#eymmj5sffiz#l2mmj5pfkizAeymqj5lffizal2mqj5sfkiz#eymuj5kffizal2muj5nfkizAeymyj5qffiz#l2myj5ufkiz%eyn2j5gffiz*l2n2j5qfkiz#eyn6j5gffiz*l2n6j5qfkizAeynaj5mffizal2naj5kfkizxeynej5sffiz#l2nej5nfkizaeynij5jffizxl2nij58fkiz-eynmj5uffiz%l2nmj56fkiz-eynqj5sffiz#l2nqj5dfkiz+eynuj5jffizxl2nuj5rfkiz#eynyj5vffiz%l2nyj5nfkizaeyo2j5vffiz%l2o2j5ifkizxeyo6j59ffiz-l2o6j5gfkiz*eyoaj5bffiz=l2oaj5ofkizAeyoej5sffiz#l2oej5qfkizAeyoij5qffizAl2oij5lfkizaeyomj5kffizxl2omj5jfkizxfelqj5nffeyakmlqj5sfkey#h2l6j5tfhez\\f2m2j5rffgz#kym2j5qfkgzAg6j2j5ff3nq*faluj5mfffzakqluj54fkfz:fmlmj5offeyAkelmj5efkey+i6d6j5hfj1m*hqd6j5cfg1m+jylej5hfkbx*f6lyj5sfffz#kulyj5vfkfz%iul6j5tfifz/g2lej59fgax-f2m6j5ofghzAkym6j5nfjhzaf2maj6sfghz#kymaj6tfjhz%f2mej6ofghzAkymej6jfjhzxf2mij6kfgizxkymij6ofjizAf2mmj6efgiz+kymmj6rfjiz#f2mqj6kfgizxkymqj6sfjiz#f2muj6lfgizakymuj6mfjizaf2myj6sfgiz#kymyj6sfjiz#f2n2j6tfgiz#kyn2j6pfjizAf2n6j6mfgizakyn6j6ufjiz%f2naj6qfgizAkynaj6tfjiz#f2nej6rfgiz#kynej6ufjiz%f2nij6rfgiz#kynij6sfjiz#f2nmj6ffgiz*kynmj6kfjizxf2nqj6ffgiz*kynqj6tfjiz%f2nuj6gfgiz*kynuj6cfjiz+f2nyj6sfgiz#kynyj67fjiz-f2o2j6ufgiz%kyo2j6nfjizAf2o6j6hfgiz*kyo6j6mfjizaf2oaj6rfgiz#kyoaj6vfjiz%f2oej6dfgiz+kyoej6lfjizaf2oij68fgiz-kyoij6jfjizxf2omj6nfgizakyomj6mfjizah6l6j6cfgcy+fulij6fffdy*k6lij6lfkdyafilqj6offezAkilqj6efkez+iql6j6tficy/f6m2j6efggz+kum2j6sfjgz#gadej6hfd1k*hal6j6jfhcyxfeluj6ufffz%kmluj6vfkfz%falyj6efggz+kqlyj6ufjgz%hel6j6jfhcyximl6j6gficy*f6m6j6qfghzAkum6j6sfjhz#fqlmj6effez+kalmj6ufkez%f6maj6kfghzxkumaj6gfjhz*f6mej6gfghz*kumej6ufjhz%f6mij6qfgizAkumij6tfjiz#f6mmj6jfgizxkummj6ffjiz*f6mqj6pfgizAkumqj6qfjiz#f6muj6pfgizAkumuj6lfjizaf6myj6gfgiz*kumyj6ofjizAf6n2j6jfgizxkun2j6qfjizAf6n6j6kfgizxkun6j6nfjizaf6naj6rfgiz#kunaj6nfjizaf6nej6mfgizakunej6ffjiz*f6nij6mfgizakunij6kfjizxf6nmj6ofgizAkunmj6sfjiz#f6nqj6tfgiz#kunqj6sfjiz#f6nuj6nfgizakunuj6tfjiz%f6nyj6hfgiz*kunyj6sfjiz#f6o2j6gfgiz*kuo2j6ufjiz%f6o6j6ofgizAkuo6j68fjiz-f6oaj6ufgiz%kuoaj67fjiz-f6oej6rfgiz#kuoej6gfjiz*f6oij6tfgiz%kuoij6sfjiz#f6omj6sfgiz#kuomj6nfjizajulej6jfjbyxhil6j6jfhcyxiil6j6ificyxhml6j6gfhcy*iel6j6hficy*hql6j6jfhbyxial6j6hfiby*fmlqj6qfgfzAkelqj6vfjfz%hul6j6mfhbyai6l6j6ifibyxfylij6gffdy*k2lij6efkdy+hyl6j6lfhaxai2l6j6lfiaxafam2j6nfghzakqm2j6ifjhzxfiluj6pfgfzAkiluj6rfjfz#felyj6nfggzAkmlyj6rfjgz#fam6j6ofghzAkqm6j6ufjhz%jqlej65fiby:famaj6mfghzakqmaj6lfjhzafamej6ofghzAkqmej6jfjhzxfamij6vfgiz%kqmij6kfjizxfammj6ufgiz%kqmmj6nfjizafamqj6dfgiz+kqmqj6hfjiz*famuj6pfgizAkqmuj6pfjizAfamyj6tfgiz#kqmyj6gfjiz*fan2j6ufgiz%kqn2j6kfjizafan6j6ufgiz%kqn6j6ifjizxfanaj6qfgizAkqnaj6tfjiz#fanej6jfgizxkqnej6qfjizAfanij6qfgizAkqnij6jfjizxfanmj6kfgizxkqnmj6mfjizafanqj6qfgiz#kqnqj6tfjiz#fanuj6ifgizxkqnuj6tfjiz#fanyj6sfgiz#kqnyj6ifjizxfao2j6tfgiz%kqo2j6tfjiz%fao6j6kfgizxkqo6j6sfjiz#faoaj6bfgiz=kqoaj6vfjiz%faoej6ffgiz*kqoej6ufjiz%faoij6ffgiz*kqoij69fjiz=faomj6nfgizakqomj67fjiz-fulmj6hfgfz*k6lmj6lfjfzafqlqj7tfgfz#kalqj7nfjfzafem2j7pfghzAkmm2j7rfjhz#jylij7gfjey*fmluj7lfggzakeluj7lfjgzag2lij79fgey=fem6j7hfghz*kmm6j7tfjhz#filyj7gfggz*kilyj7pfjgzAfemaj7ffghz*kmmaj7nfjhzafemej7efghz+kmmej7lfjhzafemij7gfgiz*kmmij7mfjizafemmj7bfgiz=kmmmj7nfjizAfemqj7hfgiz*kmmqj7mfjizafemuj7ufgiz%kmmuj7pfjizAfemyj7qfgiz#kmmyj7pfjizAfen2j7efgiz+kmn2j7kfjizxfen6j7cfgiz+kmn6j7nfjizafenaj7ffgiz*kmnaj7ifjizxfenej7nfgizakmnej7mfjizafenij7jfgizxkmnij7pfjizAfenmj7pfgizAkmnmj7gfjiz*fenqj7ifgizxkmnqj7ffjiz+fenuj7hfgiz*kmnuj7ifjizxfenyj7efgiz+kmnyj7lfjizafeo2j7hfgiz*kmo2j7kfjizxfeo6j7cfgiz+kmo6j7rfjiz#feoaj7jfgizxkmoaj7lfjizafeoej7dfgiz+kmoej7pfjizAfeoij7ifgizxkmoij7tfjiz#feomj7sfgiz#kmomj7mfjizah6laj7zfhfz\\iqlaj7zfifz/feeej73b4br:fylmj7hfgfz*k2lmj7gfjfz*fim2j7jfghzxkim2j7ufjhz%fulqj7rfgfz#k6lqj7ffjfz*fim6j7jfghzxkim6j7mfjhzafimaj7jfghzxkimaj7hfjhz*fmlyj7ufggz%kelyj7qfjgzAfqluj7nfggzakaluj7gfjgz*fimej7pfghzAkimej7ifjhzxfimij7nfgizakimij7pfjizAfimmj7sfgiz#kimmj7tfjiz%fimqj7jfgizxkimqj7qfjizAfimuj7ifgizxkimuj7jfjizxfimyj7ifgizxkimyj7hfjiz*fin2j7pfgizAkin2j7qfjizAfin6j7nfgizakin6j7tfjiz#finaj7sfgiz#kinaj7rfjiz#finej7rfgiz#kinej7jfjizxfinij7efgiz+kinij7tfjiz%finmj7hfgiz*kinmj7nfjizafinqj7rfgiz#kinqj7nfjizafinuj7efgiz+kinuj7gfjiz*finyj7nfgizakinyj7mfjizafio2j7qfgizAkio2j7rfjiz#fio6j7gfgiz*kio6j7gfjiz*fioaj7cfgiz+kioaj7lfjizafioej7ofgizAkioej7efjiz+fioij7dfgiz+kioij7ffjiz*fiomj7mfgizakiomj7lfjizag6lij7zfhgz|halaj7tfgfz\\fyiij7tf6tp|julij7sfjez#imlaj76fjfz-fmm2j7ufghz%kem2j7hfjhz*g2lmj7afgfz=jylmj7ffjfz*helaj7dfhcy+i2d6j7kfj1mxhud6j7efg1m+fmm6j7nfghzakem6j7rfjhz#fylqj7sfggz#k2lqj7efjgz+fmmaj7qfghzAkemaj7nfjhzafmmej7mfghzakemej7nfjhzafmmij7ifgizxkemij7nfjizafmmmj7lfgizakemmj7hfjiz*fmmqj7hfgiz*kemqj7jfjizxfmmuj7lfgizakemuj7jfjizxfmmyj7rfgiz#kemyj7tfjiz%fmn2j7hfgiz*ken2j7pfjizAfmn6j7ifgizxken6j7tfjiz#fmnaj7gfgiz*kenaj7mfjizafmnej7jfgizxkenej7ifjizxfmnij7mfgizakenij7ffjiz*fmnmj7rfgiz#kenmj7tfjiz%fmnqj7pfgizAkenqj7gfjiz*fmnuj7ffgiz*kenuj7kfjizxfmnyj7lfgizakenyj7ufjiz%fmo2j7hfgiz*keo2j7jfjizxfmo6j7ifgizxkeo6j7sfjiz#fmoaj7qfgiz#keoaj7mfjizafmoej7mfgizakeoej7qfjizAfmoij7pfgizAkeoij7ifjizxfmomj7nfgizakeomj7gfjiz*fqlyj7hfggz*kalyj7tfjgz#iilaj7tficy-fuluj7qfggzAk6luj7ifjgzxhyd6j7cfi1m+hilaj7jfhbyxjqlij78fiez-g6lmj8tfhgz|fqm2j8hfghz*kam2j8nfjhzAhmlaj8hfhax*ielaj8gfiby*fqm6j8dfghz+kam6j8kfjhzxjulmj8sfjgz#fqmaj8gfghz*kamaj8qfjhzAfqmej8gfghz*kamej8sfjhz#fqmij8hfgiz*kamij8ufjiz%fqmmj8pfgizAkammj8nfjizafqmqj8gfgiz*kamqj8sfjiz#fqmuj8bfgiz=kamuj8tfjiz#fqmyj8kfgizxkamyj8jfjizxfqn2j8cfgiz+kan2j8ifjizxfqn6j8rfgiz#kan6j8kfjizxfqnaj8ufgiz%kanaj8lfjizafqnej8ifgizxkanej8tfjiz#fqnij8rfgiz#kanij8tfjiz#fqnmj8afgiz=kanmj8pfjizAfqnqj8kfgizxkanqj8ofjizAfqnuj8efgiz+kanuj8hfjiz*fqnyj8nfgizakanyj8ifjizxfqo2j8cfgiz+kao2j8lfjizafqo6j8gfgiz*kao6j8jfjizxfqoaj8nfgizakaoaj8ifjizxfqoej8ifgizxkaoej8kfjizafqoij8qfgiz#kaoij8kfjizxfqomj8ffgiz*kaomj8nfjizafulyj8ifghzxk6lyj8pfjhzAg2lqj8hfggz*jylqj8kfjgzxfyluj8vfggz%k2luj8cfjgz+hqlaj8ffhax*ialaj8hfiax*fum2j8tfghz#k6m2j8ofjhzAfum6j8ofghzAk6m6j8gfjhz*g6lqj8zfhgz|fumaj8nfghzAk6maj8pfjhzAfumej8ffghz*k6mej8rfjhz#fumij8hfgiz*k6mij8mfjizafummj8ffgiz+k6mmj8mfjizafumqj8lfgizak6mqj8rfjiz#fumuj8ifgizxk6muj8gfjiz*fumyj8jfgizxk6myj8kfjizxfun2j8mfgizak6n2j8ufjiz%fun6j8dfgiz+k6n6j8ofjizAfunaj8jfgizxk6naj8kfjizxfunej8mfgizak6nej8nfjizafunij8kfgizxk6nij8cfjiz+funmj8hfgiz*k6nmj8ifjizxfunqj8ifgizxk6nqj8nfjizAfunuj8mfgizak6nuj8tfjiz#funyj8hfgiz*k6nyj8pfjizAfuo2j8hfgiz*k6o2j8hfjiz*fuo6j8dfgiz+k6o6j8cfjiz=fuoaj8ffgiz*k6oaj8nfjizafuoej8ifgizxk6oej8jfjizxfuoij8ofgizAk6oij8efjiz+fuomj8lfgizak6omj8gfjiz*fylyj8lfghzak2lyj8ufjhz%jqlmj87fjgz-julqj8tfjgz#g2luj8hfhgz*jyluj8ufjgz%fym2j8sfhhz#k2m2j8qfihzAg2iqj8bf7tp=fym6j8pfhhzAk2m6j8sfihz#hulaj8ffg9x*i6laj8ffj9x*jmdej8kfm2oxfymaj8lfhhzak2maj8ufihz%fymej8qfhhzAk2mej8lfihzafymij8rfhiz#k2mij8dfiiz+fymmj8efhiz+k2mmj8ffiiz*fymqj8hfhiz*k2mqj8kfiizxfymuj8ufhiz%k2muj8jfiizxfymyj8mfhizak2myj8cfiiz=fyn2j8lfhizak2n2j8rfiiz#fyn6j8lfhizak2n6j8hfiiz*fynaj8ofhizAk2naj8ifiizxfynej8ffhiz*k2nej8sfiiz#fynij8jfhizxk2nij8kfiizxfynmj8pfhizAk2nmj8ofiizAfynqj8dfhiz+k2nqj8gfiiz*fynuj8efhiz+k2nuj8efiiz+fynyj8afhiz=k2nyj8ifiizxfyo2j8dfhiz+k2o2j8rfiiz#fyo6j8jfhizxk2o6j8ufiiz%fyoaj8ofhizAk2oaj8ifiizxfyoej8nfhizak2oej8dfiiz+fyoij8ifhizxk2oij8pfiizAfyomj8ffhiz*k2omj8cfiiz+g6luj8zfhhz|jmlmj8zfihz|g2lyj8hfhhz*jylyj8tfihz#jqlqj88fihz-juluj8nfihzag2m2j8qfhhzAjym2j8cfihz+hylaj8ffh9x*i2laj8hfi9x*g2m6j8mfhhzajym6j8tfihz#g6lyj8zfhhz|g2maj8hfhhz*jymaj8jfihzxg2mej8rfhhz#jymej8rfihz#g2mij8nfhizajymij8ffiiz*g2mmj8sfhiz#jymmj8cfiiz+g2mqj8vfhiz%jymqj8mfiizag2muj8rfhiz#jymuj8pfiizAg2myj8rfhiz#jymyj8gfiiz*g2n2j8mfhizajyn2j8jfiizxg2n6j8jfhizxjyn6j8bfiiz=g2naj8ifhizxjynaj8bfiiz=g2nej8ofhizAjynej8efiiz+g2nij8lfhizajynij8hfiiz*g2nmj8gfhiz*jynmj8gfiiz*g2nqj8gfhiz*jynqj8kfiizxg2nuj8gfhiz*jynuj8dfiiz+g2nyj8gfhiz*jynyj8hfiiz*g2o2j8ffhiz*jyo2j8ffiiz*g2o6j8efhiz+jyo6j8bfiiz=g2oaj8bfhiz=jyoaj8qfiizAg2oej8nfhizajyoej8cfiiz+g2oij8cfhiz+jyoij8dfiiz+g2omj8efhiz+jyomj8efiiz+jmlqj8vfihz%k2i2j8tfvpq|julyj8vfihz%jqluj8afihz=g6m2j8tfhhz|g6m6j88fhhz-jum2j8rfihz#g6maj88fhhz-g6mej88fhhz-g6mij88fhiz-g6mmj89fhiz=g6mqj8bfhhz=g6muj89fhhz=kqeyj84bydl:f6eyj8kf58pxfui2j8gf0kk*g6myj8cfhhz+jum6j8mfihzajumaj8qfihzAjumej8pfihzAjumij8tfiiz%jummj8ufiiz%jumqj8efiiz+jumuj8kfiizxjumyj8efiiz+g6n2j8lfhhzajun2j8sfiiz#g6n6j8tfhiz#jun6j8hfiiz*g6naj8rfhiz#junaj8dfiiz+g6nej8hfhiz*junej8ffiiz*g6nij8hfhiz*junij8dfiiz+g6nmj8efhiz+junmj8dfiiz+g6nqj8pfhizAjunqj8cfiiz+g6nuj8ofhizAjunuj8hfiiz*g6nyj8dfhiz+junyj8kfiizxg6o2j8pfhizAjuo2j8kfiizag6o6j8dfhiz+juo6j8hfiiz*g6oaj8jfhizxjuoaj8cfiiz+g6oej8hfhiz*juoej8bfiiz=g6oij8gfhiz*juoij8efiiz+g6omj8hfhiz*juomj8tfiiz#jqlyj89fihz-jqm2j98fihz-jqm6j99fihz=gamyj9tfhhz|gan2j9tfhhz|gan6j95fhiz:ganaj97fhiz-ganej95fhiz:ganij98fhhz-jqmaj9bfihz=ganmj9afhhz=jqmej9jfihzxganqj9cfhhz+jqmij9cfihz=jqmmj9gfiiz*jqmqj9jfiizxjqmuj9dfiiz+jqmyj9sfiiz#jqn2j9mfiizajqn6j9nfiizajqnaj9jfiizxjqnej9vfiiz%jqnij9tfiiz#jqnmj9jfiizxjqnqj9bfiiz=ganuj9hfhhz*jqnuj9ifiizxganyj9tfhiz%jqnyj9sfiiz#gao2j9kfhizxjqo2j9ffiiz*gao6j9tfhiz#jqo6j9cfiiz+gaoaj9pfhizAjqoaj9efiiz+gaoej9ffhiz*jqoej9cfiiz+gaoij9hfhiz*jqoij9bfiiz=gaomj9gfhiz*jqomj9bfiiz=helej9tfhfz\\jmmej9tfihz|genqj9tfhhz|jmmij9xfihz|jmmmj9zfihz|jmn2j99fiiz=jmn6j9bfihz=genuj96fhhz:genyj98fhiz-geo2j98fhhz-jmmqj9vfihz%jmmuj98fiiz-jmmyj97fiiz-jmnaj9gfihz*geo6j9bfhhz=jmnej99fihz=geoaj9afhhz=jmnij9pfihzAjmnmj9ofiizAjmnqj9qfiizAjmnuj9jfiizxjmnyj9rfiiz#jmo2j9ffiiz*jmo6j9lfiizajmoaj9gfiiz*geoej9lfhhzajmoej9dfiiz+geoij9ffhiz*jmoij9bfiiz=geomj9dfhiz+jmomj9dfiiz+jimuj9vfiiz%iilej96fjez:gioaj9yfhhz|jinij9tfiiz|jinmj97fiiz-jinqj99fihz-gioej96fhhz-gioij96fhiz-giomj99fhiz=jinej9tfiiz|jinuj9afihz=jinyj9afihz=jio2j9efihz+jio6j9ifiizxjioaj9qfiiz#jioej9nfiizajioij9ffihz*jiomj9jfihzxjenyj9tfihz|jeo2j9tfihz|jeo6j98fihz-jeoaj99fihz=jeoej9afihz=jenaj9vfiiz%jeoij9cfihz+jeomj9lfiizahilej9cfgax+jaoej9zfihz|jaomj98fiiz-jaoij9tfihz|kah6j9afsvn=janaj9vfiiz%gqnaj9vfiiz%gun6j9vfiiz%j6n6j9vfiiz%gun2j9vfiiz%fmh6j9tf1nk|gymyj9ufiiz%j2n2j9vfiiz%h2muj9vfiiz%iymyj9vfiiz%h2mqj98fhiz-iymuj9sfiiz#h6mqj9sfhiz#iumuj9vfiiz%gejej9tfdyk|h6mmj99fhiz-iumqj9tfiiz\\h6mij9tfhiz|h6omj9zfhiz|iqmuj9vfiiz%hammj9tfhhz\\iqmqj9vfiiz%hamij94fhiz:hamqj9vfhhz%haomj94fhiz:hamej94fhiz:iqmmj99fiiz=haoij94fhiz:hao6j9tfhiz|haoaj9tfhiz|haoej94fhiz:hamaj9yfhiz/iqmij9wfiiz\\hao2j9yfhiz|fqduj9kf48mxk6duj92bv8m.immqj9vfiiz%hemej95fhiz:hemij94fhiz:hemmj94fhhz:immmj9tfiiz/heo6j94fhiz:heoaj94fhiz:heoej97fhiz-heoij98fhiz-heomj97fhiz-hemaj94fhiz:immij94fiiz:hemqj9tfhhz\\heo2j94fhiz:hemuj9vfhhz%henyj94fhiz:hem6j9tfhiz/immej9tfiiz\\henuj9tfhiz|imomj9zfiiz|hemyj9vfhhz%henqj9zfhiz|imoij9zfiiz|himaj94fhiz:himej95fhhz:himij9afhiz=iimij95fiiz:himmj94fhiz:iimmj94fihz:himqj94fhiz:himuj9tfhhz\\hinuj96fhiz:hinyj97fhiz-hio2j94fhiz:hio6j96fhiz-hioaj95fhiz:hioej96fhiz-hioij98fhiz-hiomj97fhiz-iiomj94fiiz:him6j95fhiz:iimej94fiiz:iimqj9tfihz/himyj9tfhhz\\hinqj94fhiz:iioij97fiiz-him2j9tfhiz/iimuj9zfihz/hinmj94fhiz:iioej94fiiz:iimaj94fiiz:hin2j9zfhhz\\iio2j9tfiiz|iio6j94fiiz:iioaj94fiiz:iimyj9vfihz%hinij9tfhiz|iinyj9zfiiz|hmm6j96fhiz:hmmaj97fhhz-hmmej97fhhz-iemej97fiiz-hmmij96fhiz:iemij95fiiz:hmmmj96fhiz-iemmj94fiiz:hmmqj96fhiz:iemqj94fiiz:hmmuj95fhiz:iemuj9tfihz/hmmyj94fhhz:hmnmj95fhiz:hmnqj96fhiz-hmnuj96fhiz:hmnyj95fhiz:hmo2j95fhiz:ieo2j96fiiz:hmo6j96fhiz-ieo6j96fiiz-hmoaj97fhiz-ieoaj95fiiz:hmoej95fhiz:ieoej95fiiz:hmoij96fhiz-ieoij9dfiiz+hmomj95fhiz:ieomj95fiiz:hmm2j94fhiz:hmlyj9tfhiz/iemaj97fiiz-iemyj9zfihz/hmn2j95fhhz:hmnij94fhiz:ienyj9afiiz=iem6j94fiiz:ien2j9vfihz%hmn6j9tfhhz|hmnej94fhiz:ienuj94fiiz:hmnaj94fhiz:ienqj94fiiz:iem2j9tfiiz\\ien6j9vfihz%ienmj9tfiiz|hqlyj9tfhkz-hqm2j95fhhz:hqm6j96fhhz-iam6j95fiiz:hqmaj97fhhz-iamaj96fihz-hqmej97fhhz-iamej97fihz-hqmij97fhiz-iamij96fiiz:hqmmj96fhiz-iammj95fiiz:hqmqj99fhiz=iamqj96fiiz:hqmuj95fhiz:iamuj95fiiz:hqmyj95fhiz:iamyj94fiiz:hqn2j95fhiz:ian2j9tfihz/hqn6j98fhiz-hqnaj95fhiz:hqnej97fhiz-hqnij95fhiz:hqnmj9afhiz=hqnqj96fhiz-ianqj95fiiz:hqnuj95fhiz:ianuj95fiiz:hqnyj98fhiz-ianyj95fiiz:hqo2j96fhiz:iao2j97fiiz-hqo6j9dfhiz+iao6j95fiiz:hqoaj97fhiz-iaoaj96fiiz:hqoej96fhiz-iaoej96fiiz-hqoij96fhiz-iaoij96fiiz:hqomj96fhiz-iaomj96fiiz-iam2j94fiiz:ian6j9zfihz|ianmj94fiiz:ialyj9tfiiz\\ianaj9zfihz|ianij94fiiz:ianej9tfiiz\\hulyj9tfhhz-i6lyj9afilz=hum2j95fhhz:i6m2j97fihz-hum6j96fhhz:i6m6j96fihz-humaj9ffhhz*i6maj95fihz:humej95fhhz:i6mej95fihz:humij98fhiz-i6mij98fiiz-hummj97fhiz-i6mmj97fiiz-humqj9vfhiz%i6mqj95fiiz:humuj97fhiz-i6muj95fiiz:humyj97fhiz-i6myj95fiiz:hun2j97fhiz-i6n2j94fiiz:hun6j97fhiz-i6n6j94fiiz:hunaj98fhiz-i6naj94fiiz:hunej97fhiz-i6nej94fiiz:hunij96fhiz-i6nij94fiiz:hunmj96fhiz-i6nmj9sfiiz#hunqj96fhiz-i6nqj97fiiz-hunuj96fhiz-i6nuj96fiiz-hunyj96fhiz:i6nyj95fiiz:huo2j97fhiz-i6o2j96fiiz:huo6j96fhiz:i6o6j9afiiz=huoaj96fhiz-i6oaj9ofiizAhuoej96fhiz-i6oej96fiiz-huoij96fhiz-i6oij96fiiz:huomj96fhiz-i6omj97fiiz-i2lyj9tfihz-hylyj9tfhhz-hym2j95fhhz:i2m2j96fihz:hym6j96fhhz-i2m6j97fihz-hymaj96fhhz-i2maj96fihz-hyomj95fhiz:i2omj95fiiz:hymej97fhhz-i2mej96fihz-hymij97fhiz-i2mij99fiiz-hymmj98fhiz-i2mmj96fiiz-hymqj97fhiz-i2mqj97fiiz-hymuj97fhiz-i2muj96fiiz-hymyj97fhiz-i2myj98fiiz-hyn2j97fhiz-i2n2j99fiiz=hyn6j98fhiz-i2n6j96fiiz-hynaj98fhiz-i2naj94fiiz:hynej95fhiz:i2nej98fiiz-hynij95fhiz:i2nij94fiiz:hynmj98fhiz-i2nmj94fiiz:hynqj98fhiz-i2nqj95fiiz:hynuj94fhiz:i2nuj95fiiz:hynyj9efhiz+i2nyj94fiiz:hyo2j95fhiz:i2o2j95fiiz:hyo6j97fhiz-i2o6j95fiiz:hyoaj97fhiz-i2oaj95fiiz:hyoej96fhiz-i2oej96fiiz-hyoij9cfhiz+i2oij95fiiz:j2daj9jfn2nxgudaj98ff0k-ielejabfk9x=hmlejahff9x*hqlejagfg8w*ialejaefj8w+hqluja9fikz=g6iyjatf6sq\\k6hejatfymk-hulejbhfg8w*i6lejbefj8w+fqhejbtf1mk|hylejbgfh8w*i2lejbgfi8w*i6lujbwfiuu\\kmeqjb7bxam-faeqjbjf2amxfigyjb9f9wn=hilijbtfgdy\\fme2jbgf39m*kae2jb8fw9m-k2hyjcgfvoq*g2dijckfb1kxjudijc2bwao.fuhyjcjf0klxielijctfjdy/fieajc9f85p=keeajc6bw9m:fegqjccf2qk=hmlijcbfe9w=fagmjcdf4tj+kieijcefw9m+feeijc4b76p:fudqjckf48nxk2dqjc2bv8n.kqf2jdcfyel+f6f2jd2b1el.gaj6jdff5ps*ialijdafk8w=hqlijdfff8w*kqfajddfyjm+f6fajd7f3kq-iydajdjfm2nxgydajdcff0l+jidejdhfr4o*gedejdcfd1k=kqfejdefygm+f6fejd2b1gm.fyiejdtf1mm\\hulijdffg8w+i6lijddfj8w+hylijdefh8w+i2lijddfi8w+fydmjekf65nxjydmje4bt5n:f6gaje4b1mk:kqfqje6byem-f6fqje3b1em.hmlmjexffdy\\jyiejehfyim*k2hujedfvor+g2imjeef3pn+fuhujetf1kl/gijijfbf5uj=jyiajflfykmaialmjftfjcy/hqlmjftfedy\\fyiajfjf1lmxkqfmjfbfyjm=f6fmjfbf1jm=iudajfkfj1oxkqf6jf7fzhl-f6f6jf2b3hr.g6iujgff2on*hulmjgbfgax=i6lmjgafjax=kqgajghfwnq*h2dajgaff0l=hylmjgbfh9x=i2lmjgbfiax=juimjghftnu*jejijgtfkzk|fqdyjgjf3anxk6dyjgefwan+kqfijhefygm+f6fijh8f1gm-gejajhtf9up|figujhtf2pl-hulqjhtffez-i6lqjhzfirw/fme6jhbf2an=kae6jhbfxan=k6hajhtfxpm|fmh2jhdf2pl+k2hqjhtfykm|i2lqjitfkez-fqhajitf2pm\\fuhqjitf1km|kmeujidfxbm+faeuji5b2bm:iyjyjidfutk+jqiujiffslv*hylqjitfhdy-jyi6jihfxmn*fyi6jilf2mnagaj2jicf2on+h6dajiffg0l*kah2jitfqvo|gyjyjiaf4tj=keeejjbfxbn=fieejj7b3an-feemjj8f3an-kiemjjcfxam+fudujj4b48n:k2dujjafv8n=jajmjjdfvtj+gmjmjjaf4tj=k2hmjkffyjm+g6iqjkif2ooxfuhmjktf1jm|juiijktfsqt|g2iijkjf2onxg6dijkhfa2m*jqdijk4bv9p:jmj2jkgfrlw*hadajkifg0lxk2hijkffykm*fagijk2b1nl.jqiqjktfrqu|jedejkdfr5o+gidejkffd1l*fuhijltf1km|fydqjljf57nxjydqjl6bu7n-kqg6jl2bvqp.f6g6jl5b1ml:fqe2jl3b3ao:k6e2jlcfwao+gaiyjlhf2np*g2dmjlhf75n*judmjl5bs5n:kqfujl8fydl-f6fujl4b1dl:kmeyjmafxcn=faeyjm2b2cn.jyi2jmjfxmnxhedajmcfg0l+jmiyjmtfrov/fyi2jmmf2mnakmgijmffwlr*gijejmcf3pn=fmeajmdf39n+kaeajmdfw9n+gej6jmff3po*j6jqjmdfvtj+juiejmffwmp*g2iejnlf2mpagqjqjnbf4tj=jejejntfpur|keeijn6bwbn-fieijngf3bn*hidajn7fh0l-j2jujndfvtj+iedajn6bi0l-gujujnaf4tj=jqimjoffvpq*jij6joffrlw*g6imjolf3ppak6h6jotfxon\\iadajogfi0l*hmdajo7bh0l-fqh6jotf2on\\k2hejotfxnn|fmgyjotf3qn|jyhyjohfxlo*kieqjocfxbn=feeqjoff2bn*jmiujocfvnr+fuhejotf2nn|gaiujolf3opai6dajojfi0lxhqdajogfh0l*fyhyjoif2loxi2dajpffi0l*hudajpdfh0l+hydajpefi0l+kagyjpbfruq=fagejp4b1mm:kmgejp2buqq.jajijpdfvqo+kqg2jp2byjl.f6g2jp7b0jl-kqfyjp3bzgl:juiajpifxmpxf6fyjp8f0gl-jadejp3bl1l:gmdejp6be1l-gmjijpcf3qo+g2iajpmf2mpafudyjp4b48o:k2dyjp6bv8o:kmf2jpgfxdn*faf2jp7f2dn-jij2jqcfvmr+gej2jqif4nqxgijajqef3op+kmfqjq6bxcn-fafqjq6b2cn:jyhujqjfxkoxkmfajqafyio=fafajq9f1io=fyhujqjf2koxjejajqafpsu=gadijr8fc2m-jmdijr4bo2m:jmiqjrifvoqxfqe6jr9f49o-k6e6jrbfv9o=kmfejr6bygo-fafejref1go+jyhqjrlfxkpakmfmjr4byko:fafmjr6b1ko-jqiijrhfvoq*figqjr2b4sm.gaiqjrlf3nqag6iijrlf4oqafyhqjrjf2kpxjui6jrgfxmp*fegmjs2b5tm.kigmjs3btqs.g2i6jsjf2mpxjiiyjshfvnr*kmf6js4byho:faf6jsbf1ho=geiyjsif4nrxfydujs7b58o-jydujs5bu8o:j6jmjscfvqp=fiemjsif39oxkeemjsffw9o*k2hajstfwpn|gqjmjsbf4qp=kaeejs9fv9o=fmeejsef49o+fuhajstf3on|k6h2js7fwpo-fqh2jstf3pn|kieujs8fxco-feeujshf2co*kegqjtffsrs*kmfijt6byho:fafijt9f1ho=jyhmjtkfxlpxj6dejt8fl1l-gqdejt8fe1l-g6dmjt3b75o:jqdmjtbfs5o=jajejtdfupr+gmjejtef4or+g2dqjt5b66o:judqjteft6o+fyhmjtjf2lpxjej6jtcfuns+gij6jtef4or+jqiejthfwmq*fagaju5b2om:kmgaju3bxon.g6iejukf3mqxjmimjuifvprxgaimjulf4orajui2juhfwmq*jiiujujfvnrxg2i2juif3mqxfue2jucf49p=k2e2jugfv9p*geiujukf4orafmgujutf3qn-kagujutfruq/jyhijvkfxmpaj2jqjvcfuro+jidijvbfn2m=gedijvifc2mxfyhijvlf2mpagujqjvbf5ro=jej2jvgfuns*gij2jvgf5ns*jajajvffuos*gmjajvef5ns+juhyjvjfwlqxk6eajw9fv9p-fqeajwaf49p=g2hyjwjf3lqxkieyjwafxdo=feeyjwif2doxjqiajwhfwnr*g6iajwjf3nrxj6jijwdfvor+gqjijwcf4or+j2dejwdfk1l+gudejwbff1l=jiiqjxjfvorxfmeijxff3ao*kaeijxcfwao+fydyjx9f59q=jydyjxafu9q=geiqjxjf5osxjmiijxifuorxgaiijxlf5oraiyjujxcfsun+jeiyjxifunsxgiiyjxif5nsxiqk2jxcfutk+juhujxifwlqxfieqjxhf3ao*keeqjxffwao*k2h6jxtfwpo|jyhejxjfwopxgyjujy8f7un-g2hujyhf3lq*fuh6jytf3po|jaj6jyhftot*gmj6jydf6ot+fyhejymf3opaj6jejydfunt+h6k2jyaf5tj=gqjejyef5nt+fegijy2b2on.kigijy2bxon.jqi6jyhfvnr*k6gyjy3bvqo:fqgyjy8f4qo-g6i6jykf4nrxkif2jy8fxfp-fef2jycf2fp+fue6jygf4aq*k2e6jycfvaq+g2dujycf58q+judujy8fu8q-kifajy9fxhp=fefajy8f2hp-j2jmjybfuor=kif6jy8fxhq-fef6jycf2hq=jmdmjydfr5p+gadmjyff85p*kifejzdfxhp+fefejzaf2hp=gujmjzff4or*iydejzjfj0lxgydejz5bg0l:iujyjzdfpxk+kifqjz9fwao-fefqjzff3ao*kmfujz9fw9n=kmg6jz4bxon:fag6jz8f2on-g6dqjz4b77q:jqdqjz7fs7q-juhqjzkfxlqxjeiujzgfuns*fafujz5b39n:kifmjz7bxip-fefmjz4b2ip:jiimjzifuosxgiiujzjf5nsxg2hqjztf2lq\\kifijz6bxhq-fefijz8f2hq-geimjzlf5osah2jyjzbfbxk=jmiejzjfvnrxgaiek0lf4nraiudek0jfj0lxh2dek02bg0l.jaj2k0fftnt*gmj2k0ff6nt*j6jak0eftnt+gqjak0ef6nt+fqeek0ef4ap+k6eek0bfvap=figmk02b5sn.kegmk04busn:fye2k0ff5aq*jye2k0ifuaqxjedik0gfo2n*gidik0gfb2n*j2jik0eftnt+fmgqk09f5tn=jqi2k0ifvnrxkagqk02btto.g6i2k0jf4nrxgujik0ff5mt*fegek05b2mo:kigek07fxmo-juhmk1kfxlqxg2hmk1mf2lqafmemk1hf4ap*kaemk1gfvap*iyjqk1bfuor=keeuk1dfwcp+fieuk1if3cpxjeiqk1iftotxjaiyk1gftnu*jyhak1mfwopagyjqk1tf5or\\gmiyk1gf6nu*giiqk1tf6ot\\iqdek1kfl2pxh6dek1ffg1l*jmiak2gfvns*fyhak2tf3op|gaiak2lf4nsaj6j6k2fftnu*gqj6k2ff6nu*k2h2k2tfwpp|fueak2if59qxk2eak2dfu9q+j2jek2eftmu+jiiik2hfuos*gujek2ef6mu+juhik2tfwlq/g2dyk29f59r=judyk2bfu9r=geiik2if5osxg2hik2nf3lqAjqhyk2jfwmrxg6hyk2kf3mrxiyjmk3eftmu+kmfyk36byfo:fafyk36b1fo-kmg2k38fyko-fag2k35b1ko:k6guk32bvqp.gyjmk3lf6muaiujuk3afupr=imdek3kfk2pxhadek3ffg1l*jaiuk3iftnuxfqeik3ff4aq*k6eik39fvaq=jidmk3ifq5pxgedmk3gf95p*j6j2k3dfsnv+keeyk3dfwdq+fieyk3if3dqxg6duk3gf68r*jqduk3ift8rxgqj2k3hf7nu*j2jak3ffsmv+gmiuk3tf6nu-gujak3df7mv+jmdqk3gfs7r*gadqk3jf77rxh2juk4tf5pr\\jeimk4iftotxjmi6k4jfvnsxgai6k4lf5nsagiimk4of6otAfye6k49f59q-jye6k4gfu9q*jadik4efn2n+gmdik48fc2n-iyjik4hftmu*fegak43b3oo:kigak44bwoo:iqjyk4aftsq=jqhuk4lfwmragyjik4if6luxjiiek4ifuntxiidek4kfk2qxhedek4dfg1m+juhek4tfvnq/geiek4nf5ntag6huk4mf3mrag2hek5nf4nqAj2j6k5ffrmv*j6iyk5hfsnv*h6jyk5tf6sq\\guj6k5tf8mv\\gqiyk5hf7nv*imk2k5tfmyk/fmeqk5ef4bq+kaeqk57fvbq-iujqk5fftmu*jyh6k5lfvoqajaiqk5lfsouaiyjek5ffrlv*gyjek5gf7lv*fyh6k5tf4oq|iedek53bi1m:hidek5cfh0m+gmiqk5pf7ouAkef2k5afweq=fif2k5cf3eq+h2jqk5tf6mu\\hak2k6afeyk=jmi2k6kfunsxfueek6hf59q*k2eek6ffu9q*gai2k6nf5nsajqhqk6tfwlr/g2e2k66b59r-jue2k6ifu9rxiadek6cfi0m+hmdek66bh0m-g6hqk6of3lrAjeiik6iftotxiyjak6dfqlw+j2j2k6gfrmw*jiiak6iftntxgyjak6ff8lw*guj2k6mf8nwageiak6nf6ntAgiiik6of6otAiujmk6gfslv*kefak64bxhq:fifak6cf2hq+figik69f3pp=kegik6bfwpp=kef6k6afxhq=fif6k6ff2hq*i6dek6afi0m=hqdek6efh0m+j6iuk6mfrnvaiek6k6tfuuj/kefek7hfxhq*fifek78f2hq-i2dek7dfi0m+hudek7afh0m=h2jmk7tf6kv|gqiuk7lf8ovahydek7dfi0m+hik6k76f5uj-kefmk76bxiq-kefqk76bvap-fifmk78f2iq-iujik7gfrkw*fqemk7if59qxk6emk7efu9q+iqjuk7tftot/kefik74bxhq:fifik76b2hq-j6dik7gfm2o*gqdik7ffd2o+jaimk7lfsouajqhmk7tfwlr/iyj6k7gfqmw*jedmk7gfp5q*gidmk7efa5q+h2jik7nf8jwagyj6k7kf9mwxjqdyk7gft8r*g6dyk7ef68r+g6hmk7of3lrAjuhak7ofvprAj2iyk7hfqnw*gmimk7of7ouAiujek8efqkx+kaeuk87fvcq-fmeuk8if4cqxg2hak8pf4orAguiyk8lf9nvah6juk8tf6ot-h2jek8kf9kxxfyeak8af59q=jyeak8afu9q=jmhyk8mfunsakifuk86bv9o:gahyk8tf5ns|kig6k84bwmp:feg6k83b3mp:jidqk8afr7r=gedqk8df87r+fefuk86b49o-jmduk8dfs8r+gaduk8hf78r*jii6k8lftntagei6k8nf6ntAjeiek8kfsnuxj6iqk8nfrovagiiek8of6nuAiujak8dfplx+h2jak8ifakxxiyj2k8jfpmwxfigek86b3np-kegek8cfwnp+jqhik8pfwlrAgyj2k8nfanwag6hik9pf4lrAgqiqk9nf8ouaiqjqk9ifslvxkagmk9afuso=j2iuk9mfqnvaiuj6k9tfolx-imjyk9tftps/iqjmk9jfrjwxh6jqk9of7lvAh2j6k9kfblxxkig2k99fxjq-kifyk97fxgq-feg2k98f2jq-fefyk99f2gq=g2e6k97b59r-jue6k9ffu9r*fueik9df5aq+k2eik95buaq:iqjik9hfqix*jaiik9nfrouAguiuk9nf9ovajmhukatfums/h6jmkapf8iwAiqjekagfpjx*gahukaof5msAh6jikapf9ixAgmiikaof7ouAiik2kaafkzk=h6jekajfaixxiyiykalfpnwahajykadf6qs+jeiakamfsnuagiiakapf7nuAj2dikaefm2o+gudikabfd2o=gyiykaofaowAiqjakaffoky*jadmkaifo4rxgmdmka8fb4r-h6jakakfbkyxjii2kanftntagei2kaof6ntAkaeykaafwcq=fmeykahf3cq*j6imkalfrovaiuj2kalfomxahek2katffzk-h2j2kanfbnxajqhekaqfvnrAjuh6kbtfupr|g6hekbpf4nrAgqimkbtf8ov|fqeqkbif5arxk6eqkbefuar+iqj6kblfnlyajqe2kbcft9s=g6e2kbhf69s*h6j6kbnfclyaimjukbhfslv*j2iqkbtfqov/jmhqkbtfvls/imjekbefniy+gahqkbuf5lt\\jaiekbnfrnvaimjikbifohyxhajekbnfchyaimjakbffnjy*iyiukbmfpowaguiqkbtf9ov-figakb7f3oq-fyeekbdf59r+jyeekbhfu9r*kegakbbfwoq=gmiekbof8nvAhajukbtf7lv-hajakbffcjy+imjmkcmfqhxaimjqkcjfrjwxhajikcrfbgy#gii6kcpf7nuAiuiykcnfonxajei6kcnfsouajedqkccfr7s+gidqkc4b87s:iak6kc8fkzk-iqj2kcnfnmxAjmdykcffs8s+gadykcgf78s*gyiukctfaow/h2iykcofbowAh6j2kcmfcnxahajmkclf9gxaimj6kcjfmlyxhmk6kc5ffzk:haj6kcmfdlyajihykctftnu/gehykcpf6nuAjidukcefr7s+gedukcff87s*hajqkcof8iwAkaf2kc9fwer=fmf2kchf3er*j6iikcofqovAiijykctfrov-jmhmkcqfvlt#iijekcgfmhy*iijakcjfmjzxgahmkdqf5ltAhejakdtfdiz-gqiikdof8nvAhejekdnfdgyaj2imkddfqov+iek2kdtfpts-jaiakdtfrnv|iijikdlfnfyag2eakd3b69r.jueakdaft9r=fuemkdaf5ar=k2emkdffuar*gmiakdpf8nvAkafakd8fwhr-fmfakdgf3hr*hejykdtf8ov-iij6kdlfllyaimj2kdkfmnyxkaf6kd6bwhr-fmf6kdgf3hr*hej6kdkfelyxjqhakdpfuosAj6dmkddfo5r+gqdmkd4bb5r:haj2kdlfdnyakafekdifwhrxfmfekd9f3hr-hejikdofcfyAiqiykdpfnoxAg6hakdpf5osAiyiqkdtfpow/iejakdhfliz*hik2kdtfats-iuiukdtfoow-iydikdjfm2oxgydikd9fd2o-guimkdtf9ov|hijakdtfeiz\\iejekdjflgzxiijmkdofofxAh6iykdofcoxAgii2keof8ovAjmhikeqfult#jei2ketfsou-kafmke4bwhr:kagikeafvoq=fmfmkeef3hr+hijeketfegz-gahikerf5mt#kafikecfwhr+fmfikeef3hr+iej6kegfkkz*iijukekfrkwxk6eukebfvbr=fqeukedf4br+hij6kefffly*jihukepftmuAgehukeqf6nuAh2iukexfbpw-gyiqketf9ov\\hejmkepfbfxAiajakedfkiz+iij2kehflny*j6iekeofqnwAiijqkepfqhxAjqe6kebft9s=g6e6keif69sxhmjaketffiz-iejikeofmeyAhej2ketfeny|gqiekepf9mwAiajekehfkfz*iaj6keffkkz*i6jakeefjhz+hmjeketfffz-hijiketfdey#hmj6kedfflz+hejuketf8kw-hqjaketfghz-imiykeofmoxAgmi6kerf9nv#hejqkeqf9hxAjai6kemfqnvai2jakfefihz+hujakftfhhz-i6j6kfdfjlz+hyjakftfihz-i6jekftfjfz-iej2kfgfkny*j2iikftfqnw\\fyeikfbf5ar=jyeikfgfuar*hqj6kfcfglz+haiykftfdpx/keg6kfbfwnq=hqjekftfgfz-hij2kfbffoy=i2j6kfbfilz=i6k6kf7fjzk-jadqkfcfq6s+gmdqkfaf96s=huj6kftfhlz\\i2jekftfiez-iejmkfofneyAiajikfvfldy\\hyj6kftfilz/hujekftfhez-iqiukftfnpw-jme2kfgfs9s*gae2kfhf79s*hyjekftfiez-iyimkftfpow\\iejykftfqnw-hqk6kf5fgzk:guiikftf9nw/hmjikfvfedy%jmhekfrfunt#iaj2kfcfkny+iuiqkftfoow/j6iakfpfqnwAjihqkfrftmu#gehqkfrf6mu#gahekfrf5nt#gihykfvf8nv\\iudikf7fk1o-h2dikf7ff1o-hijmkfqfceyAgqiakfqf9mwAkefukf7fu8p-jehykfqfrnvAhmj2kfaffoy=iiiykflflpxah6iukgwfcqw\\iak2kgtforv-i6jikgvfkdy-jidykgdfs8t+gedykg7b78t-jedukg8fr7s-gidukg4b87s:hijykgtf9nw-j2dmkghfo5s*gudmkgefb5s+i6j2kgafjoy=hqjikgsfgcy#iejqkgnfofyAgyimkgtf9ow|heiykgtfeqx/hqj2kg9fgoy=iejukgtfpjx-i2jikgsfjcy#hmk2kgtfbrv-h2iqkgtfapw-i2j2kg9fioy=hujikgtfhcy#k6eykgcfvcr+fqeykggf4cr*iajmkgqfmdyAhyjikgsficy#j2iekgpfpmwAhuj2kggfhpy*hyj2kgffipy*gmi2kgqf9ow#jai2kgtfqov-g2eekg9f69s-jueekghft9s*hijqkgpfbfyAfueqkgif5arxk2eqkgefuar+i2k6kg6fizk-ieiykghflpx*hmjmkgufedy-guiekguf9mw-imiukgtfnpw-huk6kg7fhzk-jihmkhqftluAgehmkhsf6lu#hijukhtfajx-keg2khbfwkq=gqi6khrfanw#kefykh9fxgq=hiiykhtfeqw-j6i6khpfpnwAhyk6kh6fizk-iyiikhtfpnw/i6k2khtfmox-i6jmkhufkcy/gihukhrf8nv#iqdikhjfk1oxh6dikh5bf1o:jehukhqfrnvAiqiqkh7bopw-haiukhpfcqwAiuimkhtfpow-iaiykhtfkqw-iajykhhfomx*hqjmkhtffcy/hqk2khtfepx-iajqkhofneyAj2iakhqfpmxAjqeakhefs9s+g6eakhgf79s*gyiikhtfamw-guiakhtfamx%i2jmkhrfjcy#hmiykitffrw-hujmkitfhcy-jihikisftmu#gehikitf6mu#hmjykitfbmx-hmjqkiofdeyAhyjmkitfiby\\iajukitfniy\\iiiukitfmqw-j6dqkiefp6s+gqdqkicfa6s=i6iykitfkrw-gmhykisf9nw#i2k2kitfkny-h6iqkihfbpw*iydmkiifn5sxgydmkicfc5s+k6f2ki9fves=fqf2kijf4esxh2imkiffaow*fyemki6b69r:jyemkihft9r*jahykitfqnw%iyiekitfomx-jme6kibfs9t=gae6kiif79txhuk2kitffoy-hqiykitfgrw-hmjukitfciy-i6jqkitfldy-i2iykihfjrw*hyk2kitfiny-gqi2kirfanw#heiukiifdrwxj6i2kivfpnw-imdikikfk1oxhadiki5bf1o:gihqkisf8mv#huiykitfhsw-gyiekitfalx-hyiykihfisw*i6jykiffmmy*hqjqkjoffdyAjehqkjsfrmv#gui6kjtfbmx#j2i6kjqfonxAk6fakjefwhs+fqfakjgf3hs*k6f6kjcfwhs+fqf6kjgf3hs*iuiikjtfomx-imiqkj9fnpw=jie2kjefs9t+gee2kjaf79t=jadukjbfq7t=gmdukjef97t+i2jqkjufjdy-ieiukjqflrwAk6fekjcfwhs+fqfekjcf3hs+hqjykjtfemy-i6jukjjfmhzxiqimkjtfoow-hujqkjcfgdy+iyiakjqfomx#jedykjbfr8t=gidykjgf88t*hyjqkjtfidy\\k2eukjefubs+fueukjif5bsxjihekjtfsnu#gehekjuf7nu%gyiakjvfblx-hqjukjtfehz-k6fmkjefwhs+i2jykjefkly+fqfmkjbf3hs=k6fikj6bwhs-fqfikjcf3hs+g2eikj5b69s:jueikjgft9s*gmhukjsfanw#h2iikjtfamx-hujykjffglz*hiiukkifesvxiidikkjfj1oxhedikkbfg1o=jahukkofpnwAi2jukkgfkgz*gihmkktf8lw%hyjykktfilz-haiqkkifcqwxjehmkktfrlw#iuiekkqfolxAhujukkjfggzxiudmkkgfm5t*h2dmkk7bd5t-gqhykkqfbnxAiaiukkiflrvxhyjukkkfigzxh6imkkgfbow*gui2kksfcnx#j6hykksfonx#j2i2kkrfnnx#iyi6kkrfnmx#gyi6kkufcmx%iiiqkkdfnqw+h2iekkqfbkyAj2dqkkffo6t*gudqkk7fb6t-iqiikktfomx-iedikk6bj1o:hidikkffg1o*iuiakkrfnly#hmiuklifesvxjqeeklifs9sxg6eeklef79s+gihiklvf8mw%imimkltfoox-jehiklsfrmw#h2iaklvfcky-gmhqkltfamx#i6iuklifksvxjahqklsfpmw#iadikldfi1o+hmdiklafh1o=heiqkljfcqwxfyeqkl3b6as:jyeqkl9ftas=iqieklofnkyAgqhuklrfbnx#jmeakl3bs9t:gaeakljf79txh6iikltfblx-k2eykl9fucs=fueyklgf5cs*hqiuklufftv-iui6klsfmmy#gyi2klufcmx%guhykltfcnx#iyi2klsfmny#j6hukltfonx#iqdmkl6bm5t-h6dmklgfd5t*h2i6kltfcly%i6dikl9fi1o=hqdikl3bh1o:j6dukldfp7t+gqduklafa7t=i2iuklifjtvxj2hykltfnnx#ieiqkmifmqwxjie6km6br9t-gee6kmhf89t*iqiakmrfmky#haimkmefbox+i2dikmdfi1o+hudikmcfh1o+h6iekmrfbjy#hydikmbfi1o=huiukmhfhtv*gmhmkmtfalx#hyiukmifitvximiikmvfolx-gihekmvf9nv%h6iakmpfckyAjadykm9fq8u=gmdykmef98u+jahmkmufplx%jee2km6br9u:gie2kmgf89u*jehekmsfqnv#iiimkmgfnox*iydqkmbfn6t=gydqkmafc6t=g2emkm4b69s:juemkmhft9s*gqhqkmvfcmx%iqi6kmsfmly#iui2knufmmy%imieknnfnjyahiiqknjfdrvxguhukntfdmy%gyhykntfdmy#h2i2knufcmx%j6hqkntfnmx#iyhyknsfmmy#h6i6knxfcmy-gmhikntfamx#imdmknafl5t=hadmkn5be5t:j2huknufmmy%imiaknofnkyAiaiqknjfmrwxhaiikntfblx/jahikntfpmx#k2f2kn9fvet-fuf2knaf4et=haieknwfbiy-heimkncfbox+haiaknofcjyAiiiikntfoly\\gqhmknvfcly%g6eikn4b79t:jqeikn9fs9t=iqi2kotfnmy#imi6kotfnmy#k2fakodfvht+fufakoff4ht*iuhykosfmmy#j6hmkovfnly%guhqkoufdmy%gyhukovfdmy%k2f6kocfvht+fuf6koaf4ht=ieimkogfnox*jyeuko5bubs:fyeuko5b5bs:h2hykovfcmx%iyhukotfmmy%j2duko9fo7u=guduko3bb7u:iidmkogfk5t*hedmko8ff5t-iiiekoqfnjyAk2fekobfvht=hmiqkojfdsvxfufekodf4ht+j2hqkovfmmy%h6i2koxfbnx@i6iqkoiflsvxiiiakoqfnkyAgmhekovfbnw%iudqkodfn6u+h2dqkocfc6u+hai6kovfbmx/jahekoufpnw%jmeekodfs9t+gaeekoef79t+gqhikovfcmy%k2fikobfvht=k2fmkobfvht=fufikobf4ht=fufmkobf4ht=heiikptfbkx-j6hikpvfnmy%guhmkptfdly#j6dykpafp8u=gqdykpffa8u*iedmkpdfk5u+hidmkp6bf5u-jieakp3br9t.geeakp6b89t-gyhqkpvfdly%iuhukptfmly%heiekpufbiy-jee6kp9fr9u=gie6kp8f89u-iyhqkpuflly%iqhykpvfnmx%h2hukpufcly%j2hmkpvfmly%jae2kp9fq9u=gme2kpdf99u+heiakpsfbkx#hqiqkpzffsv-hiimkpafcox=ieiikptfoly-imi2kpzfonx/i2iqkpifksvxiii6kpsfonx#iaimkphfnpw*iadmkp5bj5u:hmdmkpdfg5u+ieiekpwfojy\\h6hykpxfamw@guhikpwfdmy%g2eqkpaf6at=jueqkp6btat-gyhmkpufely%huiqkqzfgtv\\iuhqkqsflly#hyiqkqzfitv-ieiakqpfolxAgqhekqufcox%iqdqkqdfm6u+h6dqkq7bd6u-i6dmkqefi5u+hqdmkq7bh5u-iyhmkquflly%j2hikquflmy%h2hqkqtfcly#iydukqdfn7u+gydukqffc7u*iqhukqufolx%jyeykq8fuct-fyeykqgf5ct*j6hekqvfnnx%i2dmkq7fi5u-hudmkqcfh5u+hai2kqzf9ov/hydmkqcfi5u+hei6kqpfaowAhiiikqtfbkx-gyhikqvfemy%h2hmkqtfdky#g6emkqaf79t=jqemkqbfs9t=iuhmkqsflly#hiiekqhfajx*hmimkq9fcpw=iyhikqwflmy%h6hukrzf9lw|iaiikrgfolx*imhykrtfqnw|iqhqkrsfnky#i6imkr9fnpw=guhekrwfeox@hiiakrvfalx-j2dykr8fo8v-gudykrafb8v=imdqkrafl6u=hadqkr7fe6u-j2hekruflox%iaiekrtfpjx-iei6krqfppvAh2hikrufemy%jmeikrcfs9t=gaeikrgf79t*iii2krtfqpv/iuhikrvfkmy%iqhmkrvfmky|h6hqkrzf9kx\\j6e2krafp9v=gqe2krbfa9v=jyf2krefuet+fyf2kraf5et=jae6ks9fq9u=gme6ksff99u+iuduks6bn7v-h2duks3bc7v:iaiaksnfpmwAjieeksdfr9u+geeeksgf89u*h6hmkssfbjy#gyheksvfeoy%jeeaksgfq9u*gieakscf99u+iyheksufkoy%imhukszfrlw|hqimks7feqw-iqhiksyflly|hmiikstfblx-iidqksdfk6u+hedqks4bf6u:g2euks6b6bt:jueukseftbt+i2imksdflqw+hahykszf7nu\\h6hiksvfcly|jyfaksbfuhu=fyfaksef5hu+jyf6kscfuhu+fyf6ksff5hu*i6iiksafomx=jyfeks4bugu:fyfeksdf5gu+hmiekstfakx-h2heksvfeoy%imhqkstfqjw|iuheksvfkoy%hii6ktqf9quAimhmkttfpjx|hei2ktzf8qu\\huimktcfgrw+hyimkt8fjrw-iedqktefk6u+hidqktbff6u=jyfiktdfuhu+fyfikt9f5hu=iydyktbfo8v=gydyktcfb8v=jyfmktifugtximhikttfoky|fyfmkt9f5gt-i6iekttfplx-iqdukt8fm7v-h6duktdfd7v+iqhektvfloy%hmiaktwf9nw-h6hektxfdnx/g6eqkt4b7at:jqeqkthfsat*iadqkt6bj6u-hmdqkt8fg6u-hqiikttfcmy-iihykttfsou/hahukttf6ku|j2e2ku3bo9v:gue2ku8fb9v-iai6kunfqquai6dqku8fi6u-hqdqku2bh6u.hahikujf9jxxhahmkunf7hwai2iiku8fmny-gaemkuff89t*jmemkuifr9txhahqkutf6iv|jueykufftcu+g2eyku4b6cu:i6iakuufpow-i2dqku9fi6u=hudqku9fh6u=iei2kutfrrt-imhekuufmnx\\j6e6kuafp9v=gqe6ku4ba9v:hydqkuafi6v=hqiekutfblx-imduku6bl7v:haduku7fe7v-jieikuafr9u=geeikuff89u*jaeaku9fq9u=gmeaku7f99u-huiikufffny*iudyku4bn8v:h2dyku7bc8v-jeeekv7fq9u-gieekv8f99u-hyiikvtfjoy-hahekvtfamx/i2iekvtfnmx-iihikvvfrjw\\iihmkvvftgv/iihukvtfuku-iidukv9fk7v=hedukv3bf7v:hqiakvwfbpw-iihqkvtfuhu-iye2kv7bo9v-gye2kv7bb9v-juf2kvefteu+g2f2kv6b6eu-huiekvtffny-hmi6kvuf9rt/iihekwbfqmw=hyiekwtfjny-g6eukw8f7bu-jqeukwffsbu*hehykwtf6pt\\iqdykw9fm8w=h6dykw4bd8w:iedukwcfk7v+hidukw8ff7v-hii2kwyf8ss-jufakw8fthu-g2fakw3b6hu:i2iakwrfnqw#j2e6kwafo9v=gue6kw9fb9v=juf6kw7bthu-g2f6kw5b6hu:jufekwgftgu*g2fekw3b6gu:hahakwtfbow|iadukx6bj7v-hmdukx6bg7v:i6i6kxtfqst\\gaeqkxff8au*jmeqkxhfrau*hehikxyf5hu|j6eakxgfp9v*gqeakx5ba9v:jufikxiftguxg2fikx8f6gu-jufmkxtfugu\\i6dukxbfj7w=hqdukx5bg7w:g2fmkxcf5fu+jiemkx9fr9u=geemkxhf89u*huiakxoferwAimdykxefl8w+hadykxbfe8w=iue2kx9fn9w-h2e2kx8fc9w-i2dukx4bi7w:hudukx5bh7w:jeeikxcfq9u+gieikxff99u*jaeekx6bp9v-gmeekx5ba9v:hydukx6bi7w:hehekxxf6lu/iihakxtfpow\\hehmkxwf5ft-hyiakxnfjrwAiai2kxtfrss-iehykxtftps-jqeykyefscu+g6eykycf7cu+hehukygf4ls*iye6kyffn9v*gye6ky9fc9v=iidyky8fl8w-hedyky7be8w-hehqkytf4ht/iehikysfvht#iqe2kydfm9w+h6e2ky6bd9w:hqi6kztfatt-iehekzvfuku\\hehakzjf7nvxiedykzbfk8w=hidykz5bf8w:j2eakzefo9v+gueakz5bb9v:gaeukzcf8bu+jmeukzffrbu*jqf2kzeftev+g6f2kz9f6ev=iehmkzxfvfs\\iadykz5bj8w:hmdykz8fg8w-j6eekzifp9vxgqeekz3ba9v.i2i6kztfout/iue6kzffn9w*h2e6kz5bc9w:jqfal0ifthvxg6fal03b6hv:ime2l0hfl9w*hae2l0afe9w=jqf6l0dfthv+g6f6l05b6hv:jaeil0ifp9vxgmeil03ba9v.geeql0if8auxjieql0ffrau*i6dyl0afj8w=hqdyl07bg8w-jeeml09fq9u-gieml0if99uxjqfel0tftgv\\g6fel0gf6gv*iehul0tfvls\\i2dyl09fi8w=hudyl07bh8w-hmi2l0tf8tr-hydyl05bi8w:iehal0tftmu\\iehql0tfvhs\\hihyl0tf6qr-jqfil0tftgv\\g6fil0tf6gv/iie2l0gfl9w*hee2l07be9w-jqfml0mftfvaiyeal1ffn8v*gyeal17bc8v-g6fml1tf6fv/hui6l1tfevt\\jmeyl1efscv+gaeyl1af7cv=iqe6l1ifm9wxh6e6l1afd9w=hyi6l1tfjvt-iee2l1bfk9w=hie2l17ff9w-i6i2l1tfqtr-j2eel1jfo9vxgueel1cfb9v=hihil2xf3gr@hihel2xf4js/iae2l29fj9w=hme2l26bg9w:j6eil2tfp9v\\gqeil2afa9v=geeul26b8bv-jieul2ifrbvxime6l2tfl9w-hae6l2dfe9w+iahyl2aftrr=iueal2tfm8w\\h2eal2bfd8w=i6e2l2cfj9x+hqe2l28fg9x-jaeml2jfp9vxgmeml27fa9v-jmf2l2tfsev\\gaf2l25b7ev:i2e2l28fi9x-hue2l25bh9x:jeeql2ifqavxgieql2hf9av*hye2l27fi9x-hihml3vf3fr/jmfal3tfshw|gafal3tf7hw/jmf6l3tfshw\\gaf6l3df7hw+hihal3tf4ls|iie6l3hfk9w*hee6l3dff9w+jmfel3tfsgv|gafel3tf7gv/iyeel3tfn9w\\gyeel3cfc9w+hihul3af4mr=iqeal3tfm8w-h6eal3efd8w+jmfil3mfsgvagafil3tf7gv/iee6l4ffk9w*hie6l4bff9w=jieyl4tfrcv\\geeyl45b8cv:iahel4rfwjr#hqi2l4tfaur\\hihql4bf3hr=iahil4zfwgr-j2eil4vfo9v\\gueil4ffb9v*jmfml4tfsfv|gafml4tf7fv|iae6l4gfj9w*hme6l45bg9w:j6eml4ufo9v\\gqeml4ffb9v*i6e6l4hfj9x*hqe6l49fg9x=imeal4tfl8w-haeal4bfe8w=gieul4af9bv=jeeul4tfqbv\\i2e6l5cfi9x+hue6l5afh9x=iueel5vfm9w-h2eel5efd9w+hye6l5ffi9x+jaeql5tfpav\\gmeql5hfaav*iahal5tfvls|i2i2l5tfovr-iahml5tfwfr\\jif2l5tfrew\\gef2l5df8ew+hmhyl5tf7sr-iieal5tfk8w-heeal5hff8w*iahul5tfvmr-iyeil5zfn9w\\gyeil5hfc9w*jifal6tfrhw|gefal6hf8hw*jif6l6tfrhw|gef6l6tf8hw/jifel6ufrgw|gefel6bf8gw=iqeel6ufm9w-h6eel6tfd9w/ieeal6jfk8wxhieal6fff8w*iahql6ifwhrxjeeyl6tfqcw\\gieyl6tf9cw/j2eml6xfo9w\\gueml6ifb9wxjifil6pfrgwAgefil6bf8gw=hui2l6tfewr\\iaeal6ifj8wxhmeal6tfg8w-jifml7ufrfw|j6eql7vfoaw|gqeql7hfbaw*jaeul7tfpbw\\gmeul7dfabw+gefml7tf8ew\\i6eal7hfi8w*hqeal7hfh8w*i6hyl7dfstq+imeel7tfl9w-haeel7tfe9w-iueil7tfm9w%h2eil7tfd9w/hyi2l7bfjwr=i2eal7ifi8wxhueal7efh8w+hyeal7tfi8w-jef2l8vfqew\\gif2l8tf9ew/iieel8tfk9w-heeel8tff9w/iyeml8tfn9w#gyeml8tfc9w/hmhel8tf3ir%jefal8qfqhx#gifal8if9hxxjef6l8qfqhx#gif6l8tf9hx/iqeil8tfm9w%h6eil8xfd9w/jefel8rfqgw#gifel8tf9gw/hmhil8yf2gq-ieeel8tfk9x-hieel8wff9x-jaeyl8qfpcw#gmeyl88facw-j2eql9sfoaw#gueql9tfbaw/hmhal9uf3kr%jefil9qfqfwAj6eul9qfpbwAgqeul9gfabw*gifil9tf9fw|iaeel9tfj9x-hmeel9vfg9x-hmhul9tf4or-imeil9yfl9w-haeil9yfe9w-i6eel9hfi9x*hqeel9ufh9x-iueml9tfm9w%h2eml9xfd9w/jefml9tfrew%i2eel9tfi9x-hueel9tfh9x-gifml9tf8ew|hyeel9tfi9x-hmhmlatf2fq-jaf2larfqex#gmf2latf9ex\\hqhylatf9uq-iieilaufk9x-heeilazff9x/hmh6lauf3lr%iyeqlatfnaw%gyeqlawfcaw/i6helatfwir%jafalarfqhx#gmfalavf9hx|jaf6lasfqhx#gmf6latf9hx/hmhqla3b2iq.iqemlavfm9w%h6emlayfd9w/j6eylarfpcx#gqeyla5bacx:jafelarfqgx#gmfelatf9gx|j2eulbrfobw#gueulbxfbbw|ieeilbufk9x-hieilbzff9x-i6hilbxfxfq-i6halbxfwkr|jafilbsfqfx#gmfilbxf9fx/iaeilbzfj9x-hmeilbzfg9x-i6hulbtfvor-i2hylbtfpuq-i6eilbzfi9x-hqeilbzfh9x-imemlbwfl9w@haemlbvfe9w%iueqlctfmaw#h2eqlcsfdaw#i2eilczfi9x-hueilczfh9x-hyeilczfi9x-jafmlctfqew#j6f2lcqfpex#gqf2lc6baex-gmfmlcxf9ew-iyeulcsfnbx#gyeulctfcbx%i6hmlctfxfq-j2eylcrfocx#gueylcjfbcxxj6falcqfphxAgqfalczfahx\\iiemlcxfk9x@heemlczff9x/j6f6lcsfphx#gqf6lcufahx\\i6h6lczfwlr|j6felcqfpgx#gqfelcrfagx#iqeqldufmax%h6eqldufdax%i6hqldtfwjr-ieemldwfk9x@hiemlduff9x%j6fildrfpfx#gqfildsfafx#huhyldtfdwr-iaemldwfj9x@hmemldxfg9x@j2f2lesfoex#guf2legfbex*iueulesfmbx#h2eulepfdbxAi6emleyfi9x@hqemleyfh9x@imeqlewflax%haeqleufeax%iyeylesfncx#gyeylewfccx|j6fmletfpex%hyhyletfkwr-gqfmlewfadx-i2emlezfi9x@huemlezfh9x@hyemlexfi9x@i6h2lexfwlr\\j2falerfohy#gufalehfbhy*j2f6lesfohy#guf6le2bbhy.j2felerfogy#gufelezfbgy\\iieqlftfk9x#heeqlfxff9x@iqeulftfmbx#h6eulfufdbx%hqhelfvf3hr%j2filfufofx%gufilfsfbfx#hqhulftf6qr-iyf2lfsfney#gyf2lfzfcey|iueylftfmcx#h2eylfwfdcx/ieeqlfvfk9x%hieqlfyff9x@hqhalfvf3kr%iyfalgsfnhy#gyfalgdfchy+hqhilgzf3fr-iyf6lgrfnhy#gyf6lgjfcgyxj2fmlgtfodx#gufmlgzfbdx-iaeqlgwfj9x%hmeqlgyfg9x@imeulgwflbx%haeulgwfebx%gyfelg3bcgy:iyfelgufngy%i6eqlgxfi9x@hqeqlgxfh9x@i2eqlgyfi9x@hueqlgyfh9x@hyeqlgyfi9x@iqeylgufmcy%h6eylgufdcy%iuf2lgtfmey#h2f2lgufdey%gyfilgtfcfy\\iyfilgvfnfy%iieulgufkbx%heeulgyffbx@i2hulhtfsrr\\hqh6lhwf4lr%iufalhzfnhy\\h2falhzfchy|iuf6lhtfngy#h2f6lhzfcgy|i2helhwfvhs%hqhmlhtf3gr\\h2felhzfcgy|iufelhwfngy%ieeulhwfkbx%hieulhwffbx@gyfmlhwfcdy/iyfmlhzfndy-hqhqlhtf3kr\\imeylhuflcy%haeylhufecy%i2halhvfvks%iqf2lhvfmey%h6f2lhufdey%iaeulixfjby@hmeulizfgby@h2filitfdfy|iufilivfmfy%i2hilizfvfs/i6euliwfjby@hqeulixfgby@iqfaliwfmhy@h6faliwfdhy%iqf6livfmgy%iieyliwfkcy@h6f6liufdgy%heeylivffcy%i2euliwfiby@hueuliyfhby@hyeuliyfiby@iqfelixfmgy@h6feliyfdgy@hqh2liuf4ls%h2fmlizfdey\\imf2livfley%haf2liufeey%iufmlizfmdy-ieeyljwfkcy@hieyljyffcy@i2h6ljufvls%h6filjwfdfy@iqfiljxfmfy@imfaljyflhz@hafaljwfehz@imf6ljwflgz%haf6ljvfegz%huhuljifbtsxiaeyljxfjcy@imfeljxflgz@hmeyljxfgcy@i2hmljtfwgs-hafeljxfegz@i2hqljtfvls/iif2ljufkey%hef2ljwffey%i6eyljvfjcy%hqeyljyfgcy@h6fmljzfdey-iqfmljxfmey-hqgylksf4ls#i2eylkxficy@hueylkyfhcy@hyhulktflut-iifalkyflhz@iif6lkyflgz@imfilkxflfy@hyeylkyficy@hafilkxfefy@hef6lkzfegz-hefalkzfehz@ief2lkxfkey@hif2lkxffey@huhelkxf7hw@iifelkzflgz@hefelkyfegz@i2h2lkwfvls%huhalkxf7kw@iaf2lkwfjey%ief6lkxfkgz@iefalkzfkhz@hmf2lkwfgey%hafmlkyfeey-hif6lkyffgz@imfmlkzfley-hifalkxffhz@iifilkzflfz-h6fqlkjfecyxhefillzfefy-iefellzfkgz@i6f2llwfjez@hifellzfegz@hyhellxfogy@hqf2llufgey%huhillzf7ev\\iaf6llwfjgz%iafallzfkhz@i2f2llyfidz@hmf6llyffgz@huf2llwfhdz@hyf2llyfidz@hmfallyffhz@hyhallxfnly@iifmllyfley-hefmllyfefy-iefillyfkfz@iafellzfkfz@hafqlltffcy-i6f6llyfjgz@hifillzfefy-hqf6llxfggz@imfqlltfkcy-hmfellyfffz@i6fallyfjgz@i2gyllzfvlt|hqfallyfggz@huh6llwf8mv@i2f6lmwfigz%huf6lmyfhgz@hyf6lmyfigz@hyhilmzfodx-i2falmyfjgz@i6felmyfkfz@hufalmzfhgz@iefmlmzfkfz-iafilmyfkfz@hyfalmxfigz@hqfelmyfgfz@hefqlmtffdy-iifqlmtfkdy/hifmlmvfefy-huhqlmtf8nv-hmfilmzfeey-i2felmxfjfz@huhmlmuf7fv-hufelmzfhez@hyh6lmwfnnx%hyfelmyfiez@i6filmxfkez@iefqlmwfkey-iafmlmzflfy-hifqlntfeey\\hqfilnzffey-hmfmlnxfeey\\hyhqlntfnox-huh2lnwf8mv%i2filnzfjez@hyhmlnwfofy-hufilnxfgez@iafqlnufley-i6fmlnzfkey-hyfilnwfidz@hmfqloyfedy\\hqfmloxffey-hyh2loxfnnx@i2fmloyfkey-i6fqloxfldy/hugyloxf8lw@hufmloufgdy%hyfmlovfidz%hqfqlorfedy#i2fqlpufkdy%hygylpxfnmy@hugulpzf8mw|hufqlpyfgdy\\hyfqlpufidy%hygulqyfnmy@hugqlqzf9nw|hygqlrzfmox|hygeltzflgz\\hygmltzfmmy@hygiltzfmhy@flfqkowhvhs_fpfqkswhvht_ftfqkxwhvht_fxfql2whuht_g1fql6whuhu_g5fqlawhugu_g9fqldwhtgu_jlfqldwh6gu_jpfqlawh5gu_jtfql6wh5hu_jxfql2wh5ht_k1fqkxwh4ht_k5fqkswh4ht_k9fqkowh4hs_flfuknarvhs#fpfuksarvht#ftfukwarvht#fxful1aruht#g1ful5aruhu#g5ful9arugu#g9fuldartgu#gdfulhwhtgv_ghfulkwhsgv_glfulnwhsgw_gpfulqwhrgw_gtfulswhqgw_gxfuluwhqgx_h1fulwwhpgx_h5fulywhogy_h9fum0whngy_hdfum1whngy_hhfum2whmgy_hlfum3whlgz_hpfum4whkgz_i1fum4whggz_i5fum4whfgz_i9fum3whegz_idfum2whdgy_ihfum1whcgy_ilfum0whcgy_ipfulywhbgy_itfulwwhagx_ixfuluwh9gx_j1fulswh9gw_j5fulqwh8gw_j9fulnwh7gw_jdfulkwh7gv_jhfulhwh6gv_jlfuldar6gu#jpful9ar5gu#jtful5ar5hu#jxful1ar5ht#k1fukwar4ht#k5fuksar4ht#k9fuknar4hs#flfykmarvhs#fpfykrarvht#ftfykvhlvht:fxfyl0jsuht/g1fyl5jsuhu/g5fyl8jsugu/g9fylcjstgu/gdfylfhltgv:ghfylihlsgv:glfyllhlsgw:gpfylparrgw#gtfylrarqgw#gxfyltarqgx#h1fylwarpgx#h5fylxarogy#h9fylzarngy#hdfym0arngy#hhfym1armgy#hlfym2arlgz#hpfym3arkgz#htfym4whjgz_hxfym4whigz_i1fym3arggz#i5fym3arfgz#i9fym2aregz#idfym1ardgy#ihfym0arcgy#ilfylzarcgy#ipfylxarbgy#itfylwaragx#ixfyltar9gx#j1fylrar9gw#j5fylpar8gw#j9fyllhl7gw:jdfylihl7gv:jhfylfhl6gv:jlfylchl6gu:jpfyl8hl5gu:jtfyl4hl5hu:jxfyl0hl5ht:k1fykvhl4ht:k5fykrar4ht#k9fykmar4hs#flg2kmarvhs#fpg2krarvht#ftg2kvglvht:fxg2kzgluht:g1g2l4gluhu:g5g2l8jsugu/g9g2lcjstgu/gdg2lfjstgv/ghg2liglsgv:glg2llglsgw:gpg2loglrgw:gtg2lqglqgw:gxg2lsglqgx:h1g2lvglpgx:h5g2lwglogy:h9g2lyglngy:hdg2lzglngy:hhg2m0glmgy:hlg2m1gllgz:hpg2m2arkgz#htg2m3arjgz#hxg2m3arigz#i1g2m3arggz#i5g2m2arfgz#i9g2m1glegz:idg2m0gldgy:ihg2lzglcgy:ilg2lzjscgy/ipg2lxjsbgy/itg2lvjsagx/ixg2lsgl9gx:j1g2lqgl9gw:j5g2logl8gw:j9g2llgl7gw:jdg2ligl7gv:jhg2lfgl6gv:jlg2lbgl6gu:jpg2l7gl5gu:jtg2l4gl5hu:jxg2kzgl5ht:k1g2kvgl4ht:k5g2krar4ht#k9g2kmar4hs#flg6kmarvhs#fpg6krarvht#ftg6kvflvht:fxg6kzfluht:g1g6l3fluhu:g5g6l7flugu:g9g6lcjstgu/gdg6lfjstgv/ghg6lijssgv/glg6llflsgw:gpg6lnflrgw:gtg6lqflqgw:gxg6lsflqgx:h1g6luflpgx:h5g6lwflogy:h9g6lyflngy:hdg6lzflngy:hhg6m0flmgy:hlg6m1fllgz:hpg6m2arkgz#htg6m2arjgz#i1g6m2arggz#i5g6m2arfgz#i9g6m1flegz:idg6m0fldgy:ihg6lzflcgy:ilg6lyflcgy:ipg6lxjsbgy/itg6lvjsagx/ixg6ltjs9gx/j1g6lqfl9gw:j5g6lnfl8gw:j9g6llfl7gw:jdg6lifl7gv:jhg6lefl6gv:jlg6lbfl6gu:jpg6l7fl5gu:jtg6l3fl5hu:jxg6kzfl5ht:k1g6kvfl4ht:k5g6krar4ht#k9g6kmar4hs#flgaklarvhs#fpgakqarvht#ftgakuelvht:fxgakzeluht:g1gal3eluhu:g5gal7elugu:g9galbeltgu:gdgaleeltgv:ghgalijssgv/glgalljssgw/gpgalojsrgw/gtgalqelqgw:gxgalselqgx:h1galuelpgx:h5galwelogy:h9galxelngy:hdgalzelngy:hhgam0elmgy:hlgam0ellgz:hpgam2arkgz#htgam2arjgz#i1gam2arggz#i5gam2arfgz#i9gam0elegz:idgam0eldgy:ihgalzelcgy:ilgalxelcgy:ipgalwelbgy:itgaluelagx:ixgaltjs9gx/j1galqjs9gw/j5galojs8gw/j9galkel7gw:jdgalhel7gv:jhgaleel6gv:jlgalbel6gu:jpgal7el5gu:jtgal3el5hu:jxgakzel5ht:k1gakuel4ht:k5gakqar4ht#k9gaklar4hs#fpgekqarvht#ftgekudlvht:fxgekydluht:g1gel3dluhu:g5gel7dlugu:g9geladltgu:gdgeledltgv:ghgelhdlsgv:glgelljssgw/gpgelnjsrgw/gtgelqjsqgw/gxgelsdlqgx:h1geludlpgx:h5gelvdlogy:h9gelxdlngy:hdgelydlngy:hhgelzdlmgy:hlgem0dllgz:hpgem1arkgz#htgem2arjgz#i1gem2arggz#i5gem1arfgz#i9gem0dlegz:idgelzdldgy:ihgelydlcgy:ilgelxdlcgy:ipgelvdlbgy:itgeludlagx:ixgelsdl9gx:j1gelqjs9gw/j5gelnjs8gw/j9gelljs7gw/jdgelhdl7gv:jhgeledl6gv:jlgeladl6gu:jpgel7dl5gu:jtgel3dl5hu:jxgekydl5ht:k1gekudl4ht:k5gekqar4ht#fpgikqarvht#ftgikuarvht#fxgikycluht:g1gil2cluhu:g5gil6clugu:g9gilacltgu:gdgildcltgv:ghgilhclsgv:glgilkclsgw:gpgilnjsrgw/gtgilqjsqgw/gxgilsjsqgx/h1gilujspgx/h5gilvclogy:h9gilxclngy:hdgilyclngy:hhgilzclmgy:hlgim0cllgz:hpgim1arkgz#i5gim1arfgz#i9gim0clegz:idgilzcldgy:ihgilyclcgy:ilgilxclcgy:ipgilvclbgy:itgiltclagx:ixgilrcl9gx:j1gilpcl9gw:j5gilnjs8gw/j9gilkjs7gw/jdgilhjs7gv/jhgilejs6gv/jlgilacl6gu:jpgil6cl5gu:jtgil2cl5hu:jxgikycl5ht:k1gikuar4ht#k5gikqar4ht#fpgmkparvht#ftgmkuarvht#fxgmkybluht.g1gml2bluhu.g5gml6blugu.g9gmlabltgu.gdgmldbltgv.ghgmlgblsgv.glgmljblsgw.gpgmlmblrgw.gtgmlpblqgw.gxgmlsjsqgx/h1gmlujspgx/h5gmlvjsogy/h9gmlwblngy.hdgmlyblngy.hhgmlzblmgy.hlgmm0bllgz.hpgmm1arkgz#i5gmm1arfgz#i9gmm0blegz.idgmlzbldgy.ihgmlyblcgy.ilgmlwblcgy.ipgmlvblbgy.itgmltblagx.ixgmlrbl9gx.j1gmlpbl9gw.j5gmlmbl8gw.j9gmljbl7gw.jdgmlhjs7gv/jhgmlejs6gv/jlgmlajs6gu/jpgml6bl5gu.jtgml2bl5hu.jxgmkybl5ht.k1gmkuar4ht#k5gmkpar4ht#ftgqkuarvht#fxgqkxaluht.g1gql2aluhu.g5gql6alugu.g9gql9altgu.gdgqldaltgv.ghgqlgalsgv.glgqljalsgw.gpgqlmalrgw.gtgqloalqgw.gxgqlralqgx.h1gqltjspgx/h5gqlvjsogy/h9gqlxjsngy/hdgqlxalngy.hhgqlyalmgy.hlgqm0arlgz#hpgqm0arkgz#i5gqm0arfgz#i9gqm0aregz#idgqlyaldgy.ihgqlxalcgy.ilgqlwalcgy.ipgqlualbgy.itgqltalagx.ixgqlral9gx.j1gqloal9gw.j5gqlmal8gw.j9gqljal7gw.jdgqlgal7gv.jhgqldjs6gv/jlgqlajs6gu/jpgql6js5gu/jtgql2al5hu.jxgqkxal5ht.k1gqkuar4ht#ftguktarvht#fxgukyaruht#g1gul19luhu.g5gul59lugu.g9gul99ltgu.gdgulc9ltgv.ghgulg9lsgv.glgulj9lsgw.gpgull9lrgw.gtgulo9lqgw.gxgulq9lqgx.h1guls9lpgx.h5gulu9logy.h9gulw9lngy.hdgulx9lngy.hhguly9lmgy.hlgum0arlgz#i9gum0aregz#idguly9ldgy.ihgulx9lcgy.ilgulw9lcgy.ipgulu9lbgy.itguls9lagx.ixgulq9l9gx.j1gulo9l9gw.j5gull9l8gw.j9gulj9l7gw.jdgulg9l7gv.jhgulc9l6gv.jlgul99l6gu.jpgul59l5gu.jtgul19l5hu.jxgukyar5ht#k1guktar4ht#fxgykxaruht#g1gyl2aruhu#g5gyl58lugu.g9gyl98ltgu.gdgylc8ltgv.ghgylf8lsgv.glgyli8lsgw.gpgyll8lrgw.gtgylo8lqgw.gxgylq8lqgx.h1gyls8lpgx.h5gylu8logy.h9gylv8lngy.hdgylx8lngy.hhgylyarmgy#hlgylzarlgz#i9gylzaregz#idgylyardgy#ihgylx8lcgy.ilgylv8lcgy.ipgylu8lbgy.itgyls8lagx.ixgylq8l9gx.j1gylo8l9gw.j5gyll8l8gw.j9gyli8l7gw.jdgylf8l7gv.jhgylc8l6gv.jlgyl98l6gu.jpgyl58l5gu.jtgyl2ar5hu#jxgykxar5ht#g1h2l1aruhu#g5h2l5arugu#g9h2l9artgu#gdh2lc6ltgv.ghh2lf6lsgv.glh2li6lsgw.gph2ll6lrgw.gth2ln6lqgw.gxh2lq6lqgx.h1h2ls6lpgx.h5h2lt6logy.h9h2lwarngy#hdh2lxarngy#hhh2lyarmgy#idh2lyardgy#ihh2lxarcgy#ilh2lwarcgy#iph2lt6lbgy.ith2ls6lagx.ixh2lq6l9gx.j1h2ln6l9gw.j5h2ll6l8gw.j9h2li6l7gw.jdh2lf6l7gv.jhh2lc6l6gv.jlh2l9ar6gu#jph2l5ar5gu#jth2l1ar5hu#g9h6l9artgu#gdh6lcartgv#ghh6lfarsgv#glh6liarsgw#gph6llarrgw#gth6loarqgw#gxh6lqarqgx#h1h6lsarpgx#h5h6luarogy#h9h6lvarngy#ilh6lvarcgy#iph6luarbgy#ith6lsaragx#ixh6lqar9gx#j1h6loar9gw#j5h6llar8gw#j9h6liar7gw#jdh6lfar7gv#jhh6lcar6gv#jlh6l9ar6gu#glhaliarsgw#gphallarrgw#gthalnarqgw#gxhalqarqgx#ixhalqar9gx#j1halnar9gw#j5hallar8gw#j9haliar7gw#frfxkwzviizofvfxkwzviizok3fxkwzviizok7fxkwzviizofjftkjlh2eo_fjfxkjar2eo#fifvkclh2eo_fifykcar2eo#fifwk5lh2eo_fifzk5ar2eo#fifxjxlh2eo_fig1jxar2eo#fhfzjqlh2eo_fhg2jqar2eo#fhg0jjlh2eo_fhg3jjar2eo#fgg1jblh2eo_fgg5jbar2eo#fgg3j4lh2eo_fgg6j4ar2eo#fgg4ixlh2eo_fgg7ixar2eo#ffg5iplh2eo_ffg9ipar2eo#ffg7iilh2eo_ffgaiiar2eo#ffg8iblh2eo_ffgbibar2eo#kbftkjlhxeo_kbfxkjarxeo#kbfvkclhxeo_kbfykcarxeo#kbfwk5lhxeo_kbfzk5arxeo#kcfxjxlhxeo_kcg1jxarxeo#kcfzjqlhxeo_kcg2jqarxeo#kcg0jjlhxeo_kcg3jjarxeo#kdg1jblhxeo_kdg5jbarxeo#kdg3j4lhxeo_kdg6j4arxeo#keg4ixlhxeo_keg7ixarxeo#keg5iplhxeo_keg9iparxeo#keg7iilhxeo_kegaiiarxeo#kfg8iblhxeo_kfgbibarxeo#"};
+
+const out = document.getElementById("out");
+const input = document.getElementById("cmd");
+const inputRow = document.getElementById("input-row");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cmdHistory = [];
+let histPos = 0;
+
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+const c = (name, label, extra) => `<button type="button" class="cmd${extra ? " " + extra : ""}" data-cmd="${esc(name)}">[${esc(label || name)}]</button>`;
+const gh = repo => `https://github.com/${CONFIG.github}${repo ? "/" + repo : ""}`;
+const link = (url, text) => `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(text)}</a>`;
+const rows = pairs => `<div class="rows">${pairs.filter(Boolean).map(([k, v]) => `<div class="k">${k}</div><div>${v}</div>`).join("")}</div>`;
+
+const ICON = {
+  github: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>',
+  globe: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.93 6h-2.95a15.6 15.6 0 00-1.38-3.56A8.03 8.03 0 0118.93 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14a8.2 8.2 0 010-4h3.38a16.5 16.5 0 000 4H4.26zm.81 2h2.95c.32 1.25.78 2.45 1.38 3.56A8 8 0 015.07 16zm2.95-8H5.07a8 8 0 014.33-3.56C8.8 5.55 8.34 6.75 8.02 8zM12 19.96A14.2 14.2 0 0110.09 16h3.82A14.2 14.2 0 0112 19.96zM14.34 14H9.66a14.7 14.7 0 010-4h4.68a14.7 14.7 0 010 4zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14a16.5 16.5 0 000-4h3.38a8.2 8.2 0 010 4h-3.38z"/></svg>',
+};
+
+const BANNER = [
+  "..##....##.....######...",
+  "...##..##.....##....##..",
+  "....####......##........",
+  ".....##.......##..####..",
+  ".....##.......##....##..",
+  ".....##.......##....##..",
+  ".....##........######...",
+];
+
+/* ================= 2.5D portrait ================= */
+const B36 = "0123456789abcdefghijklmnopqrstuvwxyz";
+const KINDS = "fblsrhv";   // face/suit, dark hair, lens, lens sheen, frame, frame highlight, rivet
+const LEVELS = 12;
+const PALETTES = [
+  t => [40 + 162 * t, 105 + 150 * t, 85 + 146 * t, 0.35 + 0.65 * t],
+  t => [25 + 70 * t, 70 + 92 * t, 60 + 82 * t, 0.25 + 0.5 * t],
+  t => [14 + 44 * t, 34 + 76 * t, 34 + 72 * t, 1],
+  t => [60 + 90 * t, 110 + 100 * t, 105 + 100 * t, 0.85],
+  t => [22 + 30 * t, 28 + 36 * t, 27 + 35 * t, 1],
+  t => [150 + 105 * t, 140 + 95 * t, 120 + 85 * t, 0.5 + 0.5 * t],
+  t => [205 + 50 * t, 210 + 45 * t, 205 + 50 * t, 1],
+];
+const LIGHT = (() => { const l = Math.hypot(-0.35, -0.45, 1); return [-0.35 / l, -0.45 / l, 1 / l]; })();
+let HEAD_PTS = null;
+
+function headPoints() {
+  if (HEAD_PTS) return HEAD_PTS;
+  const s = HEAD3D && HEAD3D.p;
+  if (!s) return null;
+  const R = 12, n = s.length / R;
+  const P = { n, cols: HEAD3D.cols || 100, x: new Float32Array(n), y: new Float32Array(n), z: new Float32Array(n), b: new Float32Array(n),
+    k: new Uint8Array(n), nx: new Float32Array(n), ny: new Float32Array(n), nz: new Float32Array(n), ch: new Array(n), ymax: 0 };
+  const d2 = o => (B36.indexOf(s[o]) * 36 + B36.indexOf(s[o + 1]) - 648) / 4;
+  const d1 = o => B36.indexOf(s[o]) / 35;
+  for (let i = 0, o = 0; i < n; i++, o += R) {
+    P.x[i] = d2(o); P.y[i] = d2(o + 2); P.z[i] = d2(o + 4); P.b[i] = d1(o + 6); P.k[i] = KINDS.indexOf(s[o + 7]);
+    P.nx[i] = d1(o + 8) * 2 - 1; P.ny[i] = d1(o + 9) * 2 - 1; P.nz[i] = d1(o + 10) * 2 - 1; P.ch[i] = s[o + 11];
+    P.ymax = Math.max(P.ymax, Math.abs(P.y[i]));
+  }
+  return (HEAD_PTS = P);
+}
+
+function mountPortrait(canvas) {
+  const P = headPoints();
+  const ctx = canvas.getContext && canvas.getContext("2d");
+  if (!P || !ctx) return false;
+  const chars = [...new Set(P.ch)];
+  const charIdx = new Uint8Array(P.n);
+  for (let i = 0; i < P.n; i++) charIdx[i] = chars.indexOf(P.ch[i]);
+  let W = 0, H = 0, unit = 1, dpr = 1, sheet = null, cw = 0, chh = 0;
+  let yaw = 0, pitch = 0, tYaw = 0, tPitch = 0, lastMove = -1e9, running = false, visible = true, dirty = true, slow = false, tick = 0;
+
+  function buildSheet(fontPx) {
+    sheet = document.createElement("canvas");
+    cw = Math.ceil(fontPx * 0.72 * dpr) + 2; chh = Math.ceil(fontPx * 1.15 * dpr) + 2;
+    sheet.width = cw * chars.length; sheet.height = chh * PALETTES.length * LEVELS;
+    const s = sheet.getContext("2d");
+    s.font = `700 ${(fontPx * dpr).toFixed(2)}px "Geist Mono", ui-monospace, monospace`;
+    s.textAlign = "center"; s.textBaseline = "middle";
+    PALETTES.forEach((pal, pi) => {
+      for (let lv = 0; lv < LEVELS; lv++) {
+        const [r, g, b, a] = pal(lv / (LEVELS - 1));
+        s.fillStyle = `rgba(${r | 0},${g | 0},${b | 0},${a.toFixed(2)})`;
+        chars.forEach((ch, ci) => s.fillText(ch, ci * cw + cw / 2, (pi * LEVELS + lv) * chh + chh / 2));
+      }
+    });
+  }
+  function resize(force) {
+    const w = canvas.clientWidth;
+    if (!w || (w === W && !force)) return;
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = w; unit = W / (P.cols + 14); H = Math.round(unit * (P.ymax * 2 + 16));
+    canvas.style.height = H + "px";
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildSheet(unit * 1.55);
+    dirty = true;
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const cyw = Math.cos(yaw), syw = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const f = 300, ox = W / 2, oy = H / 2, cwC = cw / dpr, chC = chh / dpr;
+    const { x, y, z, b, k, nx, ny, nz, n } = P;
+    for (let i = 0; i < n; i++) {
+      const kind = k[i];
+      const nx1 = nx[i] * cyw + nz[i] * syw, nz1 = -nx[i] * syw + nz[i] * cyw;
+      const ny1 = ny[i] * cp - nz1 * sp, nz2 = ny[i] * sp + nz1 * cp;
+      if (nz2 < -0.06) continue;
+      const x1 = x[i] * cyw + z[i] * syw, z1 = -x[i] * syw + z[i] * cyw;
+      const y1 = y[i] * cp - z1 * sp, z2 = y[i] * sp + z1 * cp;
+      const lam = Math.max(0, nx1 * LIGHT[0] + ny1 * LIGHT[1] + nz2 * LIGHT[2]);
+      const rim = 1 - Math.max(0, nz2);
+      const shade = kind <= 1 ? 0.3 + 0.7 * lam + rim * rim * rim * 0.3 : 0.65 + 0.35 * lam;
+      const base = kind === 6 ? 1 : b[i];
+      const lv = Math.min(LEVELS - 1, Math.round(base * shade * (LEVELS - 1)));
+      const s = f / (f - z2), dw = cwC * s, dh = chC * s;
+      ctx.drawImage(sheet, charIdx[i] * cw, (kind * LEVELS + lv) * chh, cw, chh,
+        ox + x1 * s * unit - dw / 2, oy + y1 * s * unit - dh / 2, dw, dh);
+    }
+  }
+  function frame(t) {
+    if (!canvas.isConnected || !visible) { running = false; return; }
+    if (!reduceMotion && t - lastMove > 2500) { tYaw = Math.sin(t / 1800) * 0.34; tPitch = Math.sin(t / 2600) * 0.06; }
+    const dy = tYaw - yaw, dp = tPitch - pitch;
+    yaw += dy * 0.07; pitch += dp * 0.07;
+    if (dirty || Math.abs(dy) > 0.0004 || Math.abs(dp) > 0.0004) {
+      if (!(slow && (tick++ & 1))) { const t0 = performance.now(); draw(); dirty = false; slow = performance.now() - t0 > 14; }
+    }
+    requestAnimationFrame(frame);
+  }
+  function start() { if (!running && visible) { running = true; requestAnimationFrame(frame); } }
+  function aim(clientX, clientY) {
+    const r = canvas.getBoundingClientRect();
+    const mx = (clientX - (r.left + r.width / 2)) / (window.innerWidth / 2);
+    const my = (clientY - (r.top + r.height / 2)) / (window.innerHeight / 2);
+    // 2.5D relief: keep the turn small so it always looks solid
+    tYaw = Math.max(-1, Math.min(1, mx)) * 0.42;
+    tPitch = -Math.max(-1, Math.min(1, my)) * 0.16;
+    lastMove = performance.now();
+    start();
+  }
+  function onMove(e) {
+    if (!canvas.isConnected) { window.removeEventListener("pointermove", onMove); return; }
+    if (e.pointerType === "touch") return;
+    aim(e.clientX, e.clientY);
+  }
+  window.addEventListener("pointermove", onMove, { passive: true });
+  canvas.addEventListener("pointermove", e => { if (e.pointerType === "touch") aim(e.clientX, e.clientY); }, { passive: true });
+  if ("IntersectionObserver" in window) new IntersectionObserver(es => { visible = es[0].isIntersecting; start(); }).observe(canvas);
+  if ("ResizeObserver" in window) new ResizeObserver(() => requestAnimationFrame(() => { resize(); start(); })).observe(canvas);
+  if (document.fonts) document.fonts.ready.then(() => { resize(true); start(); });
+  resize(true); draw(); start();
+  return true;
+}
+
+function mountPortraits() {
+  document.querySelectorAll("canvas.portrait:not([data-on])").forEach(cv => {
+    cv.dataset.on = "1";
+    if (!mountPortrait(cv)) cv.closest(".art").hidden = true;
+  });
+}
+
+/* ================= screens ================= */
+const MAIN = [["about", "a"], ["whoami"], ["projects", "pj"], ["teaching", "t"], ["achievements", "ach"], ["skills", "s"], ["miscellaneous", "misc"], ["music", "m"], ["resume", "cv"], ["home"], ["clear"]];
+const CONTACTS = () => [["email", "mail"], ["github", "gh"], CONFIG.telegram && ["telegram", "tg"], CONFIG.linkedin && ["linkedin", "in"]].filter(Boolean);
+const langRow = () => `<div class="cmdrow"><span class="muted">${esc(T().language)}</span>${Object.keys(I18N).map(l => c("lang " + l, l.toUpperCase(), l === LANG ? "on" : "")).join("")}</div>`;
+
+function welcome(instant) {
+  const L = T();
+  return `<div class="hero">
+    <div class="intro">
+      <pre class="banner" aria-label="YG">${instant ? BANNER.join("\n") : ""}</pre>
+      <p class="typed${instant ? " done" : ""}">${instant ? esc(L.welcome) : ""}</p>
+      <div class="later">
+        <p>${esc(L.typeHelp[0])} <span class="acc">'help'</span>${esc(L.typeHelp[1])}</p>
+        <p><span class="pink">NEW</span> ${esc(L.newLine)} ${c("projects", L.seeIt)}</p>
+        ${langRow()}
+      </div>
+    </div>
+    <div class="art${instant ? " on" : ""}">
+      <canvas class="portrait" role="img" aria-label="ASCII portrait of ${esc(CONFIG.name)} in classic black sunglasses"></canvas>
+      <div class="hint">${esc(L.hint)}</div>
+    </div>
+    <div class="cmds later">
+      <h3>${esc(L.avail)}</h3>
+      <div class="cmdlist">${MAIN.map(([n, a]) => `<span>${c(n)}${a ? ` ${esc(T().or)} ${c(n, a)}` : ""}</span>`).join("")}</div>
+      <h3>${esc(L.contactMe)}</h3>
+      <div class="cmdlist">${CONTACTS().map(([n, a]) => `<span>${c(n)} ${esc(T().or)} ${c(n, a)}</span>`).join("")}</div>
+    </div>
+  </div>`;
+}
+
+function storyCard() {
+  const L = T();
+  return `<div class="card">
+    <div class="name">${esc(CONFIG.name)}</div>
+    <div class="tag">${esc(L.tag)}</div>
+    <div>${L.beats.map(([l, t], i) => `<div class="beat"><span class="n">0${i + 1}</span><span class="lbl">${esc(l)}</span><p>${esc(t)}</p></div>`).join("")}</div>
+    <div class="next"><span class="muted">→</span>${c("projects")}${c("teaching")}${c("contact")}<span class="muted">${esc(L.andYou)}</span>${c("whoami")}</div>
+  </div>`;
+}
+
+function projectCard(p) {
+  const tr = T().proj[p.key] || {};
+  const name = tr.name || p.name, tech = tr.tech || p.tech, desc = tr.desc || "";
+  const slug = p.repo || "math-book-series";
+  const repoUrl = p.repo ? gh(p.repo) : "";
+  const inner = `<div class="dots"><span></span><span></span><span></span></div>
+         <div class="path">~/projects/${esc(slug)}</div>
+         <div class="big"><span class="acc">$</span> ./${esc(slug)}</div>`;
+  const preview = repoUrl
+    ? `<a class="preview" href="${esc(repoUrl)}" target="_blank" rel="noopener" aria-label="Open ${esc(name)} on GitHub">${inner}</a>`
+    : `<div class="preview">${inner}</div>`;
+  const icons = repoUrl ? `<div class="icons"><a href="${esc(repoUrl)}" target="_blank" rel="noopener" aria-label="${esc(name)} on GitHub">${ICON.github}</a></div>` : "";
+  const badge = p.badge ? `<span class="badge${p.badge === "draft" ? " draft" : ""}">${esc(p.badge)}</span>` : "";
+  const title = p.cmd ? `<button type="button" class="cmd" style="font-weight:700" data-cmd="${p.cmd}">${esc(name)}</button>`
+    : `<a class="tlink" href="${esc(repoUrl)}" target="_blank" rel="noopener">${esc(name)}</a>`;
+  const repoLine = repoUrl ? `<div class="repo">${link(repoUrl, "github.com/" + CONFIG.github + "/" + p.repo + " ↗")}</div>` : "";
+  return `<div class="pcard${p.badge === "featured" ? " featured" : ""}">${preview}
+    <div class="title">${title}${badge}</div>
+    <div class="tech">${esc(tech)}</div>
+    <div>${esc(desc)}</div>
+    ${repoLine}${icons}</div>`;
+}
+
+function musicCard() {
+  const M = T().music;
+  const q = (song, artist) => encodeURIComponent(`${artist} ${song}`);
+  return `<div class="card player">
+    <div class="head"><b><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>${esc(M.title)}</b><span class="muted">${esc(M.count(TRACKS.length))}</span></div>
+    ${TRACKS.map(([song, artist], i) => `<div class="track"><span class="n">${String(i + 1).padStart(2, "0")}</span><span class="song">${esc(song)}</span><span class="artist">${esc(artist)}</span>
+      <span class="go">${link("https://www.youtube.com/results?search_query=" + q(song, artist), "▶ YouTube")}${link("https://open.spotify.com/search/" + q(song, artist), "Spotify")}</span></div>`).join("")}
+    <p class="note" style="margin:14px 0 0">${esc(M.note)}</p>
+  </div>`;
+}
+
+const contactRow = {
+  email: () => ["email", `${link("mailto:" + CONFIG.email, CONFIG.email)}<button type="button" class="cmd copy" data-copy="${esc(CONFIG.email)}">${esc(T().copy[0])}</button>`],
+  github: () => ["github", link(gh(), "github.com/" + CONFIG.github)],
+  telegram: () => CONFIG.telegram && ["telegram", link("https://t.me/" + CONFIG.telegram, "@" + CONFIG.telegram)],
+  linkedin: () => CONFIG.linkedin && ["linkedin", link(CONFIG.linkedin, CONFIG.linkedin.replace(/^https?:\/\/(www\.)?/, ""))],
+};
+
+const COMMANDS = {
+  help: { run: () => { const L = T(); return `<h3 style="margin-top:0">${esc(L.avail)}</h3>
+    <div class="cmdlist">${MAIN.map(([n, a]) => `<span>${c(n)}${a ? ` ${esc(T().or)} ${c(n, a)}` : ""} <span class="muted">- ${esc(L.desc[n] || "")}</span></span>`).join("")}</div>
+    <h3>${esc(L.contactMe)}</h3><div class="cmdlist">${CONTACTS().map(([n, a]) => `<span>${c(n)} ${esc(T().or)} ${c(n, a)}</span>`).join("")} <span>${c("contact")} <span class="muted">- ${esc(L.allAtOnce)}</span></span></div>
+    <h3>${esc(L.extras)}</h3><div class="cmdrow">${["mathbook", "neofetch", "all", "history", "sudo"].map(n => c(n)).join("")}</div>
+    <h3>${esc(L.language)}</h3>${langRow()}
+    <p class="note" style="margin-top:12px">${esc(L.keys)}</p>`; } },
+
+  about: { run: () => storyCard() },
+  projects: { run: () => `<div class="grid">${PROJECTS.map(projectCard).join("")}</div><p>${esc(T().allCode)} ${link(gh(), "github.com/" + CONFIG.github)}</p>` },
+
+  teaching: { run: () => `<div class="card">${T().teaching.map(([t, s, p], i, a) =>
+      `<div class="entry"${i === a.length - 1 ? ' style="margin-bottom:0"' : ""}><div class="t">${esc(t)}</div>${s ? `<div class="s">${esc(s)}</div>` : ""}<p${i === a.length - 1 ? ' style="margin-bottom:0"' : ""}>${esc(p)}</p></div>`).join("")}</div>` },
+
+  achievements: { run: () => `<div class="card">${rows(T().achievements.map(([k, v], i) => [esc(k), esc(v) + (i === 0 && CONFIG.olympiadYear ? " · " + esc(CONFIG.olympiadYear) : "")]))}</div>` },
+  skills: { run: () => `<div class="card">${rows(T().skills.map(([k, v]) => [esc(k), esc(v)]))}</div>` },
+  miscellaneous: { run: () => `<div class="card">${T().misc.map((m, i, a) => `<p${i === a.length - 1 ? ' style="margin-bottom:0"' : ""}>- ${esc(m)}</p>`).join("")}</div>` },
+  mathbook: { run: () => `<div class="card">${rows(T().mathbook.map(([k, v]) => v ? [esc(k), esc(v)] : (CONFIG.mathbookRole ? [esc(k), esc(CONFIG.mathbookRole)] : null)))}</div>` },
+  music: { run: () => musicCard() },
+  play: { run: args => {
+      const M = T().music, i = parseInt(args[0], 10) - 1;
+      if (!(i >= 0 && i < TRACKS.length)) return esc(M.usage);
+      const [song, artist] = TRACKS[i];
+      const url = "https://www.youtube.com/results?search_query=" + encodeURIComponent(`${artist} ${song}`);
+      window.open(url, "_blank", "noopener");
+      return `${esc(M.opening)} ${link(url, `${song} — ${artist}`)}`;
+    } },
+
+  resume: { run: () => CONFIG.resumeUrl ? link(CONFIG.resumeUrl, "resume (PDF)") : `<span class="muted">${esc(T().resumeSoon)}</span> ${c("about")}` },
+  clear: { run: () => { out.innerHTML = ""; return null; } },
+  contact: { run: () => `<div class="card">${rows(CONTACTS().map(([n]) => contactRow[n]()))}</div>` },
+  email: { run: () => rows([contactRow.email()]) },
+  github: { run: () => rows([contactRow.github()]) },
+  telegram: { run: () => CONFIG.telegram ? rows([contactRow.telegram()]) : "-" },
+  linkedin: { run: () => CONFIG.linkedin ? rows([contactRow.linkedin()]) : "-" },
+  lang: { run: args => {
+      const l = (args[0] || "").toLowerCase();
+      if (!I18N[l]) return `${esc(T().desc.lang)}<br>${langRow()}`;
+      LANG = l;
+      try { localStorage.setItem("lang", l); } catch (e) {}
+      document.documentElement.lang = l;
+      return "__home__";
+    } },
+
+  neofetch: { run: () => `<div class="card">${rows(T().neofetch.map(([k, v]) => [esc(k), esc(v)]))}</div>` },
+  all: { run: () => ["about", "projects", "teaching", "achievements", "skills", "mathbook", "miscellaneous", "music", "contact"]
+      .map(k => `<h3>${k}</h3>` + COMMANDS[k].run([])).join("") },
+  whoami: { run: () => { const w = T().whoami; return `${esc(w[0])} <span class="muted">${esc(w[1])}</span> ${c("about")}<span class="muted">${esc(w[2])}</span>`; } },
+  history: { run: () => cmdHistory.length ? cmdHistory.map((h, i) => `${String(i + 1).padStart(3)}  ${esc(h)}`).join("<br>") : esc(T().noHistory) },
+  home: { run: () => "__home__" },
+  welcome: { run: () => "__home__" },
+  ls: { run: () => "about.txt  projects/  teaching.txt  achievements.txt  skills.txt  mathbook.txt  music/  contact.txt" },
+  pwd: { run: () => "/home/visitor" },
+  sudo: { run: () => `${esc(T().sudo)} <span class="muted">${esc(T().kidding)}</span>` },
+  echo: { run: args => esc(args.join(" ")) },
+};
+
+const ALIASES = { a: "about", who: "about", w: "about", story: "about", pj: "projects", t: "teaching", ach: "achievements", s: "skills",
+  misc: "miscellaneous", cv: "resume", m: "music", songs: "music", playlist: "music", cls: "clear", gui: "all", "?": "help",
+  mail: "email", e: "email", gh: "github", git: "github", tg: "telegram", in: "linkedin", contacts: "contact", c: "contact",
+  language: "lang", til: "lang", "язык": "lang", math: "mathbook" };
+
+/* ================= terminal ================= */
+function say(html, cls) {
+  if (html == null) return null;
+  const d = document.createElement("div");
+  d.className = cls || "block";
+  d.innerHTML = html;
+  out.appendChild(d);
+  return d;
+}
+
+// print an output block piece by piece, like a terminal
+function reveal(block, stepMs = 55) {
+  if (reduceMotion || !block) return;
+  const parts = block.querySelectorAll(".beat, .rows > div, .entry, .pcard, .track, .card > p, .cmdlist > span, .cmdrow > *, h3, .next, :scope > p");
+  const items = parts.length ? parts : [block];
+  items.forEach((el, i) => { el.classList.add("rv"); el.style.animationDelay = Math.min(i * stepMs, 1400) + "ms"; });
+}
+
+function goHome() {
+  out.innerHTML = "";
+  reveal(say(welcome(true)));
+  mountPortraits();
+  enterHint.textContent = T().pressEnter;
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function run(raw, opts = {}) {
+  const text = raw.trim();
+  const [name0 = "", ...args] = text.split(/\s+/);
+  const name = ALIASES[name0.toLowerCase()] || name0.toLowerCase();
+  if (name === "home" || name === "welcome") {          // home = clear the screen, then the start screen
+    cmdHistory.push(text); histPos = cmdHistory.length;
+    goHome();
+    return;
+  }
+  const echo = say(`<span class="prompt"><span class="u">yashnarbek@profile</span>:~$</span> ${esc(text)}`, "block echo");
+  if (!text) return;
+  cmdHistory.push(text); histPos = cmdHistory.length;
+  const cmd = COMMANDS[name];
+  if (!cmd) reveal(say(T().notFound(esc(name0), c("help"))));
+  else {
+    const res = cmd.run(args);
+    if (name === "clear") { suggest("home"); return; }
+    if (res === "__home__") { goHome(); return; }
+    reveal(say(res));
+    mountPortraits();
+  }
+  if (!opts.silent) echo.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
+}
+
+function complete() {
+  const v = input.value.trim().toLowerCase();
+  if (!v) return;
+  const names = [...Object.keys(COMMANDS), ...Object.keys(ALIASES)].filter(k => k.startsWith(v));
+  if (names.length === 1) input.value = names[0];
+  else if (names.length > 1) say(names.map(n => c(n)).join(" "));
+}
+
+// after "clear": type a suggestion into the prompt so new visitors know what to do next
+const enterHint = document.getElementById("enter-hint");
+enterHint.textContent = T().pressEnter;
+let suggestId = 0;
+async function suggest(text) {
+  const id = ++suggestId;
+  input.value = "";
+  enterHint.hidden = true;
+  await new Promise(r => setTimeout(r, 350));
+  for (let i = 1; i <= text.length; i++) {
+    if (id !== suggestId) return;
+    input.value = text.slice(0, i);
+    await new Promise(r => setTimeout(r, 160));
+  }
+  if (id !== suggestId) return;
+  enterHint.textContent = T().pressEnter;
+  enterHint.hidden = false;
+  if (window.matchMedia("(pointer: fine)").matches) { input.focus({ preventScroll: true }); input.setSelectionRange(text.length, text.length); }
+}
+input.addEventListener("input", () => { suggestId++; enterHint.hidden = true; });
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") { suggestId++; enterHint.hidden = true; run(input.value); input.value = ""; }
+  else if (e.key === "Tab") { e.preventDefault(); complete(); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); if (histPos > 0) input.value = cmdHistory[--histPos]; }
+  else if (e.key === "ArrowDown") { e.preventDefault(); histPos = Math.min(cmdHistory.length, histPos + 1); input.value = cmdHistory[histPos] || ""; }
+  else if (e.ctrlKey && e.key.toLowerCase() === "l") { e.preventDefault(); out.innerHTML = ""; suggest("home"); }
+});
+
+/* ================= boot: slow, like a real terminal ================= */
+let booting = false, skipBoot = false;
+const wait = ms => skipBoot ? Promise.resolve() : new Promise(r => setTimeout(r, ms));
+document.addEventListener("keydown", () => { if (booting) skipBoot = true; });
+
+document.addEventListener("click", async e => {
+  if (booting) { skipBoot = true; return; }
+  const cp = e.target.closest("[data-copy]");
+  if (cp) {
+    const [, done, fail] = T().copy;
+    try { await navigator.clipboard.writeText(cp.dataset.copy); cp.textContent = done; }
+    catch (err) { cp.textContent = fail; }
+    return;
+  }
+  const b = e.target.closest(".cmd");
+  if (b && b.dataset.cmd) { run(b.dataset.cmd); return; }
+  if (e.target.closest("a, button, canvas")) return;
+  if (!window.getSelection().toString()) input.focus({ preventScroll: true });
+});
+
+async function typeInto(el, text, speed) {
+  for (let i = 1; i <= text.length; i++) {
+    if (skipBoot) { el.textContent = text; break; }
+    el.textContent = text.slice(0, i);
+    await wait(speed + (Math.random() < 0.08 ? 90 : 0));
+  }
+}
+
+async function boot() {
+  let seen = false;
+  try { seen = sessionStorage.getItem("booted") === "1"; sessionStorage.setItem("booted", "1"); } catch (e) {}
+  const animate = !seen && !reduceMotion;
+  if (animate) {
+    booting = true;
+    const skipNote = document.createElement("div");
+    skipNote.className = "skip"; skipNote.textContent = "press any key to skip";
+    document.body.appendChild(skipNote);
+
+    const box = say("", "boot");
+    const line = (html, cls) => { const d = document.createElement("div"); if (cls) d.className = cls; d.innerHTML = html; box.appendChild(d); return d; };
+    const cmdLine = line(`<span class="prompt"><span class="u">visitor@earth</span>:~$</span> <span class="t"></span>`, "cursor");
+    await wait(700);
+    await typeInto(cmdLine.querySelector(".t"), "ssh yashnarbek@profile", 70);
+    await wait(450);
+    cmdLine.classList.remove("cursor");
+    line(`<span class="dim">Connecting to profile.yashnarbek.dev ...</span>`);
+    await wait(750);
+    line(`<span class="dim">Connected. Last login: ${new Date().toDateString()} from Asaka, UZ</span>`);
+    await wait(500);
+    const steps = [
+      ["Started", "python3 runtime"],
+      ["Mounted", "/home/yashnarbek/projects"],
+      ["Loaded", "teaching.service (20 centers asked, 1 said yes)"],
+      ["Started", "olympiad.service (1st place)"],
+      ["Started", "portrait.service (classic wayfarers)"],
+      ["Reached", "target portfolio"],
+    ];
+    for (const [verb, what] of steps) {
+      line(`[ <span class="ok">OK</span> ] ${verb} ${esc(what)}.`);
+      await wait(220 + Math.random() * 220);
+    }
+    await wait(700);
+    box.remove();
+    skipNote.remove();
+  }
+
+  const hero = say(welcome(!animate));
+  mountPortraits();
+  if (animate) {
+    const banner = hero.querySelector(".banner");
+    const later = hero.querySelectorAll(".later");
+    later.forEach(el => el.style.visibility = "hidden");
+    for (const row of BANNER) { banner.textContent += (banner.textContent ? "\n" : "") + row; await wait(110); }
+    await wait(250);
+    hero.querySelector(".art").classList.add("on");
+    const typed = hero.querySelector(".typed");
+    await typeInto(typed, T().welcome, 38);
+    typed.classList.add("done");
+    await wait(300);
+    for (const el of later) { el.style.visibility = ""; reveal(el, 90); await wait(500); }
+    booting = false;
+  }
+  inputRow.hidden = false;
+  const start = decodeURIComponent(location.hash.slice(1));
+  if (start) run(start.replace(/-/g, " "));
+  if (window.matchMedia("(pointer: fine)").matches) input.focus({ preventScroll: true });
+}
+boot();
+</script>
+</body>
+</html>
