@@ -1,0 +1,1231 @@
+{
+  "version": 1,
+  "meta": {
+    "updatedAt": ""
+  },
+  "site": {
+    "title": "Yashnarbek G'ofirjonov's Portfolio",
+    "description": "Yashnarbek G'ofirjonov: 17, from Asaka, Uzbekistan. Self-taught developer and coding teacher, heading into Computer Science and cybersecurity.",
+    "promptUser": "yashnarbek@profile",
+    "defaultLang": "en",
+    "portraitAlt": "ASCII portrait of {name} in classic black sunglasses",
+    "photoAlt": "Photo of {name}"
+  },
+  "profile": {
+    "name": "Yashnarbek G'ofirjonov",
+    "email": "yashnarbekgofirjonov@gmail.com",
+    "github": "yashnarbek-dev",
+    "telegram": "Yashnarbek_dev",
+    "linkedin": "",
+    "resumeUrl": "Yashnarbek_Gofirjonov_Resume.pdf",
+    "olympiadYear": "",
+    "mathbookRole": "",
+    "links": []
+  },
+  "theme": {
+    "bg": "#000000",
+    "fg": "#ffebcd",
+    "accent": "#5abb9a",
+    "muted": "#b5a68f",
+    "pink": "#f4a3b4",
+    "fontSize": 19,
+    "tintPortrait": true,
+    "customCss": ""
+  },
+  "features": {
+    "boot": "session",
+    "portrait": true,
+    "photo": true,
+    "photoScan": true,
+    "chessLive": true,
+    "newLine": true,
+    "langSwitcher": true
+  },
+  "home": {
+    "bannerLabel": "YG",
+    "banner": [
+      "..##....##.....######...",
+      "...##..##.....##....##..",
+      "....####......##........",
+      ".....##.......##..####..",
+      ".....##.......##....##..",
+      ".....##.......##....##..",
+      ".....##........######..."
+    ],
+    "newTarget": "projects"
+  },
+  "boot": {
+    "prompt": "visitor@earth",
+    "command": "ssh yashnarbek@profile",
+    "connecting": "Connecting to profile.yashnarbek.dev ...",
+    "connected": "Connected. Last login: {date} from Asaka, UZ",
+    "steps": [
+      [
+        "Started",
+        "python3 runtime"
+      ],
+      [
+        "Mounted",
+        "/home/yashnarbek/projects"
+      ],
+      [
+        "Loaded",
+        "teaching.service (20 centers asked, 1 said yes)"
+      ],
+      [
+        "Started",
+        "olympiad.service (1st place)"
+      ],
+      [
+        "Started",
+        "portrait.service (classic wayfarers)"
+      ],
+      [
+        "Reached",
+        "target portfolio"
+      ]
+    ],
+    "skip": "press any key to skip"
+  },
+  "photo": {
+    "src": "assets/photo.jpg",
+    "fileName": "Yashnarbek_Gofirjonov_2026.jpg",
+    "size": "480x640",
+    "type": "JPEG"
+  },
+  "commands": {
+    "main": [
+      [
+        "about",
+        "a"
+      ],
+      [
+        "whoami",
+        ""
+      ],
+      [
+        "projects",
+        "pj"
+      ],
+      [
+        "teaching",
+        "t"
+      ],
+      [
+        "achievements",
+        "ach"
+      ],
+      [
+        "skills",
+        "s"
+      ],
+      [
+        "miscellaneous",
+        "misc"
+      ],
+      [
+        "music",
+        "m"
+      ],
+      [
+        "chess",
+        ""
+      ],
+      [
+        "resume",
+        "cv"
+      ],
+      [
+        "home",
+        ""
+      ],
+      [
+        "clear",
+        ""
+      ]
+    ],
+    "contacts": [
+      [
+        "email",
+        "mail"
+      ],
+      [
+        "github",
+        "gh"
+      ],
+      [
+        "telegram",
+        "tg"
+      ],
+      [
+        "linkedin",
+        "in"
+      ]
+    ],
+    "extras": [
+      "mathbook",
+      "neofetch",
+      "all",
+      "history",
+      "sudo"
+    ],
+    "all": [
+      "about",
+      "projects",
+      "teaching",
+      "achievements",
+      "skills",
+      "mathbook",
+      "miscellaneous",
+      "music",
+      "chess",
+      "contact"
+    ],
+    "next": [
+      "projects",
+      "teaching",
+      "contact"
+    ],
+    "disabled": [],
+    "aliases": {
+      "a": "about",
+      "who": "about",
+      "w": "about",
+      "story": "about",
+      "pj": "projects",
+      "t": "teaching",
+      "ach": "achievements",
+      "s": "skills",
+      "misc": "miscellaneous",
+      "cv": "resume",
+      "m": "music",
+      "songs": "music",
+      "playlist": "music",
+      "cls": "clear",
+      "gui": "all",
+      "?": "help",
+      "mail": "email",
+      "e": "email",
+      "gh": "github",
+      "git": "github",
+      "tg": "telegram",
+      "in": "linkedin",
+      "contacts": "contact",
+      "c": "contact",
+      "language": "lang",
+      "til": "lang",
+      "язык": "lang",
+      "math": "mathbook",
+      "chess.com": "chess",
+      "shaxmat": "chess",
+      "шахматы": "chess"
+    },
+    "ls": "about.txt  projects/  teaching.txt  achievements.txt  skills.txt  mathbook.txt  music/  contact.txt",
+    "pwd": "/home/visitor"
+  },
+  "projects": [
+    {
+      "key": "msr",
+      "name": {
+        "en": "msr: Telegram Test Bot"
+      },
+      "tech": {
+        "en": "Python · SQLite · Alembic · Telegram Mini App"
+      },
+      "desc": {
+        "en": "Exam prep inside Telegram. It sends test PDFs, checks answers in a Mini App, scores SAT and National Certificate practice tests with the Rasch (1PL IRT) model, and generates PDF certificates. Five test categories and an admin panel, all in Telegram.",
+        "uz": "Telegram ichida imtihonga tayyorgarlik. Test PDF fayllarini yuboradi, javoblarni Mini App'da tekshiradi, SAT va Milliy sertifikat mashq testlarini Rasch (1PL IRT) modeli bilan baholaydi va PDF sertifikat yaratadi. 5 ta test toifasi va admin panel — hammasi Telegramda.",
+        "ru": "Подготовка к экзаменам прямо в Telegram. Бот отправляет PDF с тестами, проверяет ответы в Mini App, оценивает пробные тесты SAT и Национального сертификата по модели Rasch (1PL IRT) и создаёт PDF-сертификаты. 5 категорий тестов и админ-панель — всё в Telegram."
+      },
+      "badge": "featured",
+      "featured": true,
+      "mutedBadge": false,
+      "repo": "msr",
+      "url": "",
+      "cmd": "",
+      "slug": ""
+    },
+    {
+      "key": "nok",
+      "name": {
+        "en": "N.O.K: Network of Knowledge"
+      },
+      "tech": {
+        "en": "Django · SQLite · Bootstrap 5 · OpenAI API"
+      },
+      "desc": {
+        "en": "A learning platform with student, teacher and CEO roles. Students buy courses with an in-app coin, teachers earn from them, and an AI teacher answers questions. Referrals, XP, tournaments and reviews.",
+        "uz": "O'quvchi, o'qituvchi va CEO rollariga ega ta'lim platformasi. O'quvchilar kurslarni ichki tanga bilan sotib oladi, o'qituvchilar daromad qiladi, sun'iy intellekt o'qituvchisi savollarga javob beradi. Referallar, XP, turnirlar va sharhlar.",
+        "ru": "Учебная платформа с ролями ученика, учителя и CEO. Ученики покупают курсы за внутреннюю монету, учителя на них зарабатывают, а ИИ-преподаватель отвечает на вопросы. Рефералы, XP, турниры и отзывы."
+      },
+      "badge": "draft",
+      "featured": false,
+      "mutedBadge": true,
+      "repo": "N.O.K",
+      "url": "",
+      "cmd": "",
+      "slug": ""
+    },
+    {
+      "key": "site",
+      "name": {
+        "en": "This portfolio",
+        "uz": "Ushbu portfolio",
+        "ru": "Это портфолио"
+      },
+      "tech": {
+        "en": "HTML · CSS · JavaScript · built with an AI coding assistant",
+        "uz": "HTML · CSS · JavaScript · AI kod yordamchisi bilan",
+        "ru": "HTML · CSS · JavaScript · с ИИ-ассистентом"
+      },
+      "desc": {
+        "en": "I designed it and directed every change; an AI coding assistant wrote the code. Terminal UI, 2.5D ASCII portrait, matrix photo reveal, 3 languages and live chess.com ratings.",
+        "uz": "Dizaynni o'zim o'ylab topdim va har bir o'zgarishni boshqardim; kodni AI yordamchisi yozdi. Terminal interfeysi, 2.5D ASCII portret, matritsa uslubidagi foto, 3 til va chess.com reytinglari jonli.",
+        "ru": "Я придумал дизайн и руководил каждым изменением; код написал ИИ-ассистент. Терминальный интерфейс, 2.5D ASCII-портрет, фото в стиле «Матрицы», 3 языка и живые рейтинги chess.com."
+      },
+      "badge": "",
+      "featured": false,
+      "mutedBadge": false,
+      "repo": "yashnarbek-dev.github.io",
+      "url": "",
+      "cmd": "",
+      "slug": ""
+    },
+    {
+      "key": "math",
+      "name": {
+        "en": "Math Book Series",
+        "uz": "Matematika kitoblari",
+        "ru": "Серия книг по математике"
+      },
+      "tech": {
+        "en": "Team of 3 · book 1 finished",
+        "uz": "3 kishilik jamoa · 1-kitob tayyor",
+        "ru": "команда из 3 · 1-я книга готова"
+      },
+      "desc": {
+        "en": "Four books that take math from school level up to graduate-level topics, written with two classmates.",
+        "uz": "Ikki sinfdoshim bilan yozayotgan 4 ta kitob: matematikani maktab darajasidan magistratura darajasidagi mavzulargacha olib boradi.",
+        "ru": "Четыре книги, которые ведут от школьной математики до тем уровня магистратуры. Пишу вместе с двумя одноклассниками."
+      },
+      "badge": "",
+      "featured": false,
+      "mutedBadge": false,
+      "repo": "",
+      "url": "",
+      "cmd": "mathbook",
+      "slug": "math-book-series"
+    },
+    {
+      "key": "cinema",
+      "name": {
+        "en": "cinema-together-bot"
+      },
+      "tech": {
+        "en": "Python · Telegram"
+      },
+      "desc": {
+        "en": "Anonymous chat plus watching movies together, in a Telegram bot.",
+        "uz": "Anonim chat va birgalikda kino ko'rish — Telegram botda.",
+        "ru": "Анонимный чат и совместный просмотр фильмов в Telegram-боте."
+      },
+      "badge": "",
+      "featured": false,
+      "mutedBadge": false,
+      "repo": "cinema-together-bot",
+      "url": "",
+      "cmd": "",
+      "slug": ""
+    },
+    {
+      "key": "survey",
+      "name": {
+        "en": "prize_survey_django"
+      },
+      "tech": {
+        "en": "Python · Django"
+      },
+      "desc": {
+        "en": "A survey website built with Django.",
+        "uz": "Django'da yaratilgan so'rovnoma sayti.",
+        "ru": "Сайт с опросами на Django."
+      },
+      "badge": "",
+      "featured": false,
+      "mutedBadge": false,
+      "repo": "prize_survey_django",
+      "url": "",
+      "cmd": "",
+      "slug": ""
+    },
+    {
+      "key": "words",
+      "name": {
+        "en": "Smart_words"
+      },
+      "tech": {
+        "en": "Dart"
+      },
+      "desc": {
+        "en": "A word game. Just have fun!",
+        "uz": "So'z o'yini. Shunchaki zavqlaning!",
+        "ru": "Игра в слова. Просто развлекайтесь!"
+      },
+      "badge": "",
+      "featured": false,
+      "mutedBadge": false,
+      "repo": "Smart_words",
+      "url": "",
+      "cmd": "",
+      "slug": ""
+    },
+    {
+      "key": "translator",
+      "name": {
+        "en": "Alfa-Betta-translator"
+      },
+      "tech": {
+        "en": "Java"
+      },
+      "desc": {
+        "en": "A translator app.",
+        "uz": "Tarjimon ilova.",
+        "ru": "Приложение-переводчик."
+      },
+      "badge": "",
+      "featured": false,
+      "mutedBadge": false,
+      "repo": "Alfa-Betta-translator",
+      "url": "",
+      "cmd": "",
+      "slug": ""
+    }
+  ],
+  "tracks": [
+    {
+      "song": "Shape of My Heart",
+      "artist": "Sting",
+      "youtube": "",
+      "spotify": ""
+    },
+    {
+      "song": "Apocalypse",
+      "artist": "Cigarettes After Sex",
+      "youtube": "",
+      "spotify": ""
+    },
+    {
+      "song": "Just the Two of Us",
+      "artist": "GlitchRex",
+      "youtube": "",
+      "spotify": ""
+    },
+    {
+      "song": "Smooth Operator",
+      "artist": "Sade",
+      "youtube": "",
+      "spotify": ""
+    },
+    {
+      "song": "Devil Eyes",
+      "artist": "Hippie Sabotage",
+      "youtube": "",
+      "spotify": ""
+    },
+    {
+      "song": "Mr. Sandman",
+      "artist": "The Chordettes",
+      "youtube": "",
+      "spotify": ""
+    },
+    {
+      "song": "End of Beginning",
+      "artist": "Djo",
+      "youtube": "",
+      "spotify": ""
+    },
+    {
+      "song": "WILDFLOWER",
+      "artist": "Billie Eilish",
+      "youtube": "",
+      "spotify": ""
+    }
+  ],
+  "chess": [
+    {
+      "user": "lucifer_7z",
+      "saved": {
+        "rapid": [
+          915,
+          919
+        ],
+        "blitz": [
+          840,
+          891
+        ],
+        "bullet": [
+          768,
+          853
+        ],
+        "puzzles": 1622,
+        "games": 3606,
+        "joined": "2025-02"
+      }
+    },
+    {
+      "user": "mr_y777",
+      "saved": {
+        "rapid": [
+          950,
+          997
+        ],
+        "blitz": [
+          900,
+          1062
+        ],
+        "bullet": [
+          798,
+          880
+        ],
+        "puzzles": 640,
+        "games": 321,
+        "joined": "2026-07"
+      }
+    }
+  ],
+  "custom": [],
+  "i18n": {
+    "en": {
+      "label": "English",
+      "or": "or",
+      "welcome": "Welcome to my personal portfolio! (Version 2.0)",
+      "typeHelp": [
+        "Type",
+        " to see the list of available commands, or just click one."
+      ],
+      "newLine": "msr scores SAT practice tests with Rasch IRT",
+      "newTag": "NEW",
+      "seeIt": "see it",
+      "avail": "Available Commands:",
+      "contactMe": "Contact Me:",
+      "extras": "Extras:",
+      "language": "Language:",
+      "hint": "move your cursor ↔",
+      "pressEnter": "↵ press Enter",
+      "keys": "Tab = autocomplete · ↑/↓ = history · Ctrl+L = clear",
+      "allAtOnce": "all at once",
+      "notFound": "Command not found: {name}. Type {help} to see the list of available commands.",
+      "desc": {
+        "help": "list all commands",
+        "about": "my story in 5 lines",
+        "whoami": "who are you?",
+        "projects": "things I've built",
+        "teaching": "how I teach code",
+        "achievements": "results and awards",
+        "skills": "what I work with",
+        "miscellaneous": "a few more things about me",
+        "music": "songs I code to",
+        "resume": "my CV",
+        "home": "back to the start screen",
+        "clear": "clear the terminal",
+        "lang": "change language: en / uz / ru",
+        "chess": "my chess.com profiles (live ratings)"
+      },
+      "tag": "17 · Asaka, Uzbekistan · self-taught developer · coding teacher",
+      "beats": [
+        [
+          "learned",
+          "I taught myself Python, Django and Linux from free YouTube videos."
+        ],
+        [
+          "taught",
+          "I asked 20 education centers to let me teach. 19 said I was too young. The 20th gave me a test and a demo lesson, and hired me. I've taught there for two summers."
+        ],
+        [
+          "proved",
+          "At the regional computer science olympiad, I took 1st. Two classmates I had tutored took 2nd and 3rd."
+        ],
+        [
+          "built",
+          "msr, a Telegram app that scores SAT practice tests with Rasch IRT. Now building N.O.K, a learning platform with an AI teacher. I build fast with AI: I vibe-code, then review and fix what it writes."
+        ],
+        [
+          "next",
+          "Computer Science and cybersecurity, and free online classes, like the videos that taught me."
+        ]
+      ],
+      "andYou": "and you?",
+      "whoami": [
+        "visitor",
+        "(you're a guest here. Try",
+        ")"
+      ],
+      "sudo": "visitor is not in the sudoers file. This incident will be reported.",
+      "kidding": "(just kidding)",
+      "resumeSoon": "Resume coming soon. Meanwhile, try",
+      "allCode": "All my code:",
+      "noHistory": "No history yet.",
+      "teaching": [
+        [
+          "Coding instructor",
+          "education center · summers 2025 and 2026",
+          "I applied to 20 education centers. 19 said I was too young. The one that tested me hired me. I teach Python basics, Linux and an introduction to penetration testing. My first class had 12 students, and I was nervous. Their first program was print(\"Hello, world\"). One student changed it to print his own name."
+        ],
+        [
+          "Python tutor",
+          "5 classmates · 6 months",
+          "I taught them while I was still learning myself. Three went to the regional olympiad and placed 2nd, 3rd and 14th."
+        ],
+        [
+          "English tutor",
+          "my younger brother and 2 of his friends",
+          "At home, with my own books."
+        ],
+        [
+          "What it taught me",
+          "",
+          "When you teach, you have to really know it. Every hard question made me better."
+        ]
+      ],
+      "achievements": [
+        [
+          "1st place",
+          "Regional Computer Science Olympiad (under 20)"
+        ],
+        [
+          "My students",
+          "2nd and 3rd place at the same olympiad"
+        ],
+        [
+          "At school",
+          "#1 in coding · top 3 in English · top 10 in math"
+        ],
+        [
+          "English",
+          "IELTS Academic 7.0 (C1), Listening 8.5"
+        ],
+        [
+          "Chess",
+          "self-taught; ~3,900 games on chess.com, rapid peak 997, puzzles peak 1622"
+        ]
+      ],
+      "skills": [
+        [
+          "Programming",
+          "Python (Django, Telegram bots), Java, Dart"
+        ],
+        [
+          "Linux",
+          "Kali, Parrot OS, Ubuntu, Arch, Tails and more"
+        ],
+        [
+          "Security",
+          "penetration testing basics, Wi-Fi security demos (with permission)"
+        ],
+        [
+          "Tools",
+          "Git, GitHub, SQLite, Alembic"
+        ],
+        [
+          "AI-assisted dev",
+          "vibe coding daily; prompting, reviewing and debugging AI-written code; managing multi-step AI tasks; OpenAI API"
+        ],
+        [
+          "Teaching",
+          "explaining code to complete beginners"
+        ],
+        [
+          "Languages",
+          "Uzbek (native), English (C1, IELTS 7.0)"
+        ],
+        [
+          "School",
+          "Asaka District Specialized School · grade 12 · graduating 2027"
+        ]
+      ],
+      "misc": [
+        "I sold my smartphone. Keyboard phone only, for calls.",
+        "Learning guitar. Studying for a driving licence.",
+        "Reading about space science and human psychology."
+      ],
+      "mathbook": [
+        [
+          "Team",
+          "3 classmates"
+        ],
+        [
+          "Plan",
+          "4 books, from school math up to graduate-level topics"
+        ],
+        [
+          "Status",
+          "book 1 is finished"
+        ],
+        [
+          "My role",
+          ""
+        ]
+      ],
+      "neofetch": [
+        [
+          "OS",
+          "Human v17 (Uzbekistan)"
+        ],
+        [
+          "Uptime",
+          "17 years"
+        ],
+        [
+          "Shell",
+          "python3"
+        ],
+        [
+          "Distros",
+          "Kali, Parrot, Ubuntu, Arch, Tails"
+        ],
+        [
+          "Phone",
+          "keyboard phone, no smartphone"
+        ],
+        [
+          "Focus",
+          "CS + cybersecurity"
+        ],
+        [
+          "Teaching",
+          "20 centers asked, 1 said yes"
+        ],
+        [
+          "AI",
+          "vibe coding daily"
+        ],
+        [
+          "Eyewear",
+          "classic wayfarers"
+        ]
+      ],
+      "copy": [
+        "[copy]",
+        "[copied ✓]",
+        "[select and copy]"
+      ],
+      "scan": {
+        "decoding": "[INFO] Decoding image data...",
+        "ok": "[OK] Image decoded"
+      },
+      "chessT": {
+        "rapid": "rapid",
+        "blitz": "blitz",
+        "bullet": "bullet",
+        "puzzles": "puzzles",
+        "best": "best",
+        "games": "games",
+        "joined": "joined",
+        "loading": "loading live ratings from chess.com...",
+        "offline": "live ratings unavailable, showing saved numbers",
+        "note": "Self-taught. Ratings load live from chess.com."
+      },
+      "music": {
+        "title": "♫ songs I code to",
+        "note": "Links open each song on YouTube or Spotify. Type play 1–{n}.",
+        "usage": "Usage: play 1–{n}",
+        "opening": "Opening",
+        "count": "{n} tracks"
+      },
+      "resumeLinks": [
+        "open",
+        "download",
+        "One page: education, teaching, projects, honors and skills."
+      ],
+      "resumeTitle": "Resume (PDF)"
+    },
+    "uz": {
+      "label": "O'zbekcha",
+      "or": "yoki",
+      "welcome": "Shaxsiy portfoliomga xush kelibsiz! (2.0-versiya)",
+      "typeHelp": [
+        "Buyruqlar ro'yxatini ko'rish uchun",
+        " deb yozing yoki shunchaki birini bosing."
+      ],
+      "newLine": "msr SAT mashq testlarini Rasch IRT modeli bilan baholaydi",
+      "newTag": "NEW",
+      "seeIt": "ko'rish",
+      "avail": "Mavjud buyruqlar:",
+      "contactMe": "Bog'lanish:",
+      "extras": "Qo'shimcha:",
+      "language": "Til:",
+      "hint": "kursorni harakatlantiring ↔",
+      "pressEnter": "↵ Enter tugmasini bosing",
+      "keys": "Tab = avtoto'ldirish · ↑/↓ = tarix · Ctrl+L = tozalash",
+      "allAtOnce": "hammasi birdaniga",
+      "notFound": "Buyruq topilmadi: {name}. Buyruqlar ro'yxati uchun {help} deb yozing.",
+      "desc": {
+        "help": "barcha buyruqlar",
+        "about": "hikoyam 5 qatorda",
+        "whoami": "siz kimsiz?",
+        "projects": "yaratgan loyihalarim",
+        "teaching": "qanday dars beraman",
+        "achievements": "natijalar va yutuqlar",
+        "skills": "nimalar bilan ishlayman",
+        "miscellaneous": "men haqimda yana bir oz",
+        "music": "kod yozayotganda tinglaydiganlarim",
+        "resume": "rezyumem",
+        "home": "bosh ekranga qaytish",
+        "clear": "terminalni tozalash",
+        "lang": "tilni o'zgartirish: en / uz / ru",
+        "chess": "chess.com profillarim (jonli reyting)"
+      },
+      "tag": "17 yosh · Asaka, O'zbekiston · mustaqil o'rgangan dasturchi · dasturlash o'qituvchisi",
+      "beats": [
+        [
+          "o'rgandim",
+          "Python, Django va Linuxni bepul YouTube videolaridan mustaqil o'rgandim."
+        ],
+        [
+          "o'rgatdim",
+          "20 ta o'quv markazidan dars berishga ruxsat so'radim. 19 tasi juda yoshligimni aytdi. 20-chisi meni test va namunaviy dars bilan sinab, ishga oldi. U yerda ikki yoz dars berdim."
+        ],
+        [
+          "isbotladim",
+          "Viloyat informatika olimpiadasida 1-o'rinni oldim. Men o'qitgan ikki sinfdoshim 2- va 3-o'rinlarni egalladi."
+        ],
+        [
+          "yaratdim",
+          "msr — SAT mashq testlarini Rasch IRT bilan baholaydigan Telegram ilovasi. Hozir N.O.K ustida ishlayapman — sun'iy intellekt o'qituvchisi bor ta'lim platformasi. AI bilan tez quraman: vibe coding qilaman, so'ng u yozgan kodni tekshirib, tuzataman."
+        ],
+        [
+          "keyingi",
+          "Informatika va kiberxavfsizlik, hamda meni o'qitgan videolar kabi bepul onlayn darslar."
+        ]
+      ],
+      "andYou": "siz-chi?",
+      "whoami": [
+        "mehmon",
+        "(bu yerda siz mehmonsiz. Sinab ko'ring:",
+        ")"
+      ],
+      "sudo": "visitor sudoers ro'yxatida yo'q. Bu holat haqida xabar beriladi.",
+      "kidding": "(hazil)",
+      "resumeSoon": "Rezyume tez orada. Hozircha buni sinab ko'ring:",
+      "allCode": "Barcha kodlarim:",
+      "noHistory": "Hali tarix yo'q.",
+      "teaching": [
+        [
+          "Dasturlash o'qituvchisi",
+          "o'quv markazi · 2025 va 2026-yil yozi",
+          "20 ta o'quv markaziga murojaat qildim. 19 tasi juda yoshligimni aytdi. Meni sinab ko'rgan markaz ishga oldi. Python asoslari, Linux va penetratsion testlashga kirishdan dars beraman. Birinchi guruhimda 12 o'quvchi bor edi va men hayajonlangan edim. Ularning birinchi dasturi print(\"Hello, world\") bo'ldi. Bir o'quvchi uni o'z ismini chiqaradigan qilib o'zgartirdi."
+        ],
+        [
+          "Python o'qituvchisi",
+          "5 sinfdosh · 6 oy",
+          "Ularni o'zim hali o'rganayotgan paytimda o'qitdim. Uchtasi viloyat olimpiadasiga borib, 2-, 3- va 14-o'rinlarni egalladi."
+        ],
+        [
+          "Ingliz tili o'qituvchisi",
+          "ukam va uning 2 do'sti",
+          "Uyda, o'z kitoblarim bilan."
+        ],
+        [
+          "Bu menga nimani o'rgatdi",
+          "",
+          "O'rgatish uchun mavzuni chindan bilishing kerak. Har bir qiyin savol meni kuchliroq qildi."
+        ]
+      ],
+      "achievements": [
+        [
+          "1-o'rin",
+          "Viloyat informatika olimpiadasi (20 yoshgacha)"
+        ],
+        [
+          "O'quvchilarim",
+          "o'sha olimpiadada 2- va 3-o'rinlar"
+        ],
+        [
+          "Maktabda",
+          "dasturlashda 1-o'rin · ingliz tilida top-3 · matematikada top-10"
+        ],
+        [
+          "Ingliz tili",
+          "IELTS Academic 7.0 (C1), Listening 8.5"
+        ],
+        [
+          "Shaxmat",
+          "mustaqil o'rgandim; chess.com'da ~3 900 o'yin, rapid eng yuqori 997, masalalar 1622"
+        ]
+      ],
+      "skills": [
+        [
+          "Dasturlash",
+          "Python (Django, Telegram botlar), Java, Dart"
+        ],
+        [
+          "Linux",
+          "Kali, Parrot OS, Ubuntu, Arch, Tails va boshqalar"
+        ],
+        [
+          "Xavfsizlik",
+          "penetratsion testlash asoslari, Wi-Fi xavfsizligi namoyishlari (ruxsat bilan)"
+        ],
+        [
+          "Vositalar",
+          "Git, GitHub, SQLite, Alembic"
+        ],
+        [
+          "AI bilan dasturlash",
+          "har kuni vibe coding; prompt yozish, AI yozgan kodni tekshirish va tuzatish; ko'p bosqichli AI vazifalarini boshqarish; OpenAI API"
+        ],
+        [
+          "O'qitish",
+          "kodni noldan boshlovchilarga tushuntirish"
+        ],
+        [
+          "Tillar",
+          "o'zbek (ona tili), ingliz (C1, IELTS 7.0)"
+        ],
+        [
+          "Maktab",
+          "Asaka tuman ixtisoslashtirilgan maktabi · bitiruvchi sinf · 2027"
+        ]
+      ],
+      "misc": [
+        "Smartfonimni sotdim. Faqat qo'ng'iroqlar uchun tugmali telefon.",
+        "Gitara chalishni o'rganyapman. Haydovchilik guvohnomasiga tayyorlanyapman.",
+        "Koinot ilmi va inson psixologiyasi haqida o'qiyman."
+      ],
+      "mathbook": [
+        [
+          "Jamoa",
+          "3 sinfdosh"
+        ],
+        [
+          "Reja",
+          "maktab matematikasidan magistratura darajasidagi mavzulargacha 4 ta kitob"
+        ],
+        [
+          "Holat",
+          "1-kitob tayyor"
+        ],
+        [
+          "Mening rolim",
+          ""
+        ]
+      ],
+      "neofetch": [
+        [
+          "OS",
+          "Inson v17 (O'zbekiston)"
+        ],
+        [
+          "Uptime",
+          "17 yil"
+        ],
+        [
+          "Shell",
+          "python3"
+        ],
+        [
+          "Distrolar",
+          "Kali, Parrot, Ubuntu, Arch, Tails"
+        ],
+        [
+          "Telefon",
+          "tugmali telefon, smartfonsiz"
+        ],
+        [
+          "Fokus",
+          "informatika + kiberxavfsizlik"
+        ],
+        [
+          "O'qitish",
+          "20 ta markaz, 1 tasi rozi bo'ldi"
+        ],
+        [
+          "AI",
+          "har kuni vibe coding"
+        ],
+        [
+          "Ko'zoynak",
+          "klassik wayfarer"
+        ]
+      ],
+      "copy": [
+        "[nusxalash]",
+        "[nusxalandi ✓]",
+        "[belgilab nusxalang]"
+      ],
+      "scan": {
+        "decoding": "[INFO] Rasm ma'lumotlari ochilmoqda...",
+        "ok": "[OK] Rasm ochildi"
+      },
+      "chessT": {
+        "rapid": "rapid",
+        "blitz": "blits",
+        "bullet": "bullet",
+        "puzzles": "masalalar",
+        "best": "eng yaxshi",
+        "games": "o'yin",
+        "joined": "qo'shilgan",
+        "loading": "chess.com'dan jonli reyting yuklanmoqda...",
+        "offline": "jonli reyting mavjud emas, saqlangan raqamlar ko'rsatilmoqda",
+        "note": "Mustaqil o'rganganman. Reytinglar chess.com'dan jonli yuklanadi."
+      },
+      "music": {
+        "title": "♫ kod yozayotganda tinglaydiganlarim",
+        "note": "Havolalar har bir qo'shiqni YouTube yoki Spotify'da ochadi. play 1–{n} deb yozing.",
+        "usage": "Foydalanish: play 1–{n}",
+        "opening": "Ochilmoqda:",
+        "count": "{n} ta qo'shiq"
+      },
+      "resumeLinks": [
+        "ochish",
+        "yuklab olish",
+        "Bir sahifa: ta'lim, o'qituvchilik, loyihalar, yutuqlar va ko'nikmalar (ingliz tilida)."
+      ],
+      "resumeTitle": "Resume (PDF)"
+    },
+    "ru": {
+      "label": "Русский",
+      "or": "или",
+      "welcome": "Добро пожаловать в моё портфолио! (Версия 2.0)",
+      "typeHelp": [
+        "Введите",
+        ", чтобы увидеть список команд, или просто нажмите на любую."
+      ],
+      "newLine": "msr оценивает пробные тесты SAT по модели Rasch IRT",
+      "newTag": "NEW",
+      "seeIt": "смотреть",
+      "avail": "Доступные команды:",
+      "contactMe": "Связаться со мной:",
+      "extras": "Дополнительно:",
+      "language": "Язык:",
+      "hint": "двигайте курсором ↔",
+      "pressEnter": "↵ нажмите Enter",
+      "keys": "Tab = автодополнение · ↑/↓ = история · Ctrl+L = очистить",
+      "allAtOnce": "все сразу",
+      "notFound": "Команда не найдена: {name}. Введите {help}, чтобы увидеть список команд.",
+      "desc": {
+        "help": "все команды",
+        "about": "моя история в 5 строках",
+        "whoami": "кто вы?",
+        "projects": "что я создал",
+        "teaching": "как я преподаю",
+        "achievements": "результаты и награды",
+        "skills": "с чем я работаю",
+        "miscellaneous": "ещё немного обо мне",
+        "music": "песни, под которые я пишу код",
+        "resume": "моё резюме",
+        "home": "на главный экран",
+        "clear": "очистить терминал",
+        "lang": "сменить язык: en / uz / ru",
+        "chess": "мои профили chess.com (живые рейтинги)"
+      },
+      "tag": "17 лет · Асака, Узбекистан · разработчик-самоучка · преподаватель программирования",
+      "beats": [
+        [
+          "учился",
+          "Я сам выучил Python, Django и Linux по бесплатным видео на YouTube."
+        ],
+        [
+          "учил",
+          "Я попросил 20 учебных центров дать мне преподавать. 19 сказали, что я слишком молод. Двадцатый дал мне тест и пробный урок — и взял на работу. Я преподавал там два лета."
+        ],
+        [
+          "доказал",
+          "На областной олимпиаде по информатике я занял 1-е место. Два одноклассника, которых я учил, заняли 2-е и 3-е."
+        ],
+        [
+          "создал",
+          "msr — Telegram-приложение, которое оценивает пробные тесты SAT по Rasch IRT. Сейчас создаю N.O.K — учебную платформу с ИИ-преподавателем. Я быстро создаю с помощью ИИ: пишу в стиле vibe coding, а потом проверяю и исправляю то, что он написал."
+        ],
+        [
+          "дальше",
+          "Информатика и кибербезопасность, а также бесплатные онлайн-уроки — как те видео, по которым учился я."
+        ]
+      ],
+      "andYou": "а вы?",
+      "whoami": [
+        "гость",
+        "(вы здесь гость. Попробуйте",
+        ")"
+      ],
+      "sudo": "visitor нет в файле sudoers. Об этом инциденте будет сообщено.",
+      "kidding": "(шутка)",
+      "resumeSoon": "Резюме скоро будет. А пока попробуйте",
+      "allCode": "Весь мой код:",
+      "noHistory": "История пока пуста.",
+      "teaching": [
+        [
+          "Преподаватель программирования",
+          "учебный центр · лето 2025 и 2026",
+          "Я обратился в 20 учебных центров. 19 сказали, что я слишком молод. Тот, что меня проверил, взял на работу. Я преподаю основы Python, Linux и введение в тестирование на проникновение. В моей первой группе было 12 учеников, и я волновался. Их первой программой была print(\"Hello, world\"). Один ученик изменил её, чтобы она печатала его имя."
+        ],
+        [
+          "Репетитор по Python",
+          "5 одноклассников · 6 месяцев",
+          "Я учил их, пока сам ещё учился. Трое поехали на областную олимпиаду и заняли 2-е, 3-е и 14-е места."
+        ],
+        [
+          "Репетитор по английскому",
+          "мой младший брат и 2 его друга",
+          "Дома, по моим книгам."
+        ],
+        [
+          "Чему это меня научило",
+          "",
+          "Чтобы учить, нужно по-настоящему знать. Каждый трудный вопрос делал меня сильнее."
+        ]
+      ],
+      "achievements": [
+        [
+          "1-е место",
+          "Областная олимпиада по информатике (до 20 лет)"
+        ],
+        [
+          "Мои ученики",
+          "2-е и 3-е места на той же олимпиаде"
+        ],
+        [
+          "В школе",
+          "№1 по программированию · топ-3 по английскому · топ-10 по математике"
+        ],
+        [
+          "Английский",
+          "IELTS Academic 7.0 (C1), Listening 8.5"
+        ],
+        [
+          "Шахматы",
+          "самоучка; ~3 900 партий на chess.com, лучший рапид 997, задачи 1622"
+        ]
+      ],
+      "skills": [
+        [
+          "Программирование",
+          "Python (Django, Telegram-боты), Java, Dart"
+        ],
+        [
+          "Linux",
+          "Kali, Parrot OS, Ubuntu, Arch, Tails и другие"
+        ],
+        [
+          "Безопасность",
+          "основы тестирования на проникновение, демонстрации безопасности Wi-Fi (с разрешения)"
+        ],
+        [
+          "Инструменты",
+          "Git, GitHub, SQLite, Alembic"
+        ],
+        [
+          "Разработка с ИИ",
+          "vibe coding каждый день; промпты, проверка и отладка кода, написанного ИИ; управление многошаговыми задачами ИИ; OpenAI API"
+        ],
+        [
+          "Преподавание",
+          "объясняю код полным новичкам"
+        ],
+        [
+          "Языки",
+          "узбекский (родной), английский (C1, IELTS 7.0)"
+        ],
+        [
+          "Школа",
+          "Асакинская районная специализированная школа · выпускной класс · 2027"
+        ]
+      ],
+      "misc": [
+        "Я продал смартфон. Только кнопочный телефон, для звонков.",
+        "Учусь играть на гитаре. Готовлюсь к водительским правам.",
+        "Читаю о космосе и психологии человека."
+      ],
+      "mathbook": [
+        [
+          "Команда",
+          "3 одноклассника"
+        ],
+        [
+          "План",
+          "4 книги: от школьной математики до тем уровня магистратуры"
+        ],
+        [
+          "Статус",
+          "1-я книга готова"
+        ],
+        [
+          "Моя роль",
+          ""
+        ]
+      ],
+      "neofetch": [
+        [
+          "OS",
+          "Человек v17 (Узбекистан)"
+        ],
+        [
+          "Uptime",
+          "17 лет"
+        ],
+        [
+          "Shell",
+          "python3"
+        ],
+        [
+          "Дистрибутивы",
+          "Kali, Parrot, Ubuntu, Arch, Tails"
+        ],
+        [
+          "Телефон",
+          "кнопочный, без смартфона"
+        ],
+        [
+          "Фокус",
+          "информатика + кибербезопасность"
+        ],
+        [
+          "Преподавание",
+          "20 центров, 1 сказал «да»"
+        ],
+        [
+          "ИИ",
+          "vibe coding каждый день"
+        ],
+        [
+          "Очки",
+          "классические wayfarer"
+        ]
+      ],
+      "copy": [
+        "[копировать]",
+        "[скопировано ✓]",
+        "[выделите и скопируйте]"
+      ],
+      "scan": {
+        "decoding": "[INFO] Декодирование изображения...",
+        "ok": "[OK] Изображение декодировано"
+      },
+      "chessT": {
+        "rapid": "рапид",
+        "blitz": "блиц",
+        "bullet": "пуля",
+        "puzzles": "задачи",
+        "best": "лучший",
+        "games": "партий",
+        "joined": "с",
+        "loading": "загружаю живые рейтинги с chess.com...",
+        "offline": "живые рейтинги недоступны, показаны сохранённые цифры",
+        "note": "Самоучка. Рейтинги загружаются с chess.com в реальном времени."
+      },
+      "music": {
+        "title": "♫ под что я пишу код",
+        "note": "Ссылки открывают каждую песню на YouTube или Spotify. Введите play 1–{n}.",
+        "usage": "Использование: play 1–{n}",
+        "opening": "Открываю:",
+        "count": "{n} треков"
+      },
+      "resumeLinks": [
+        "открыть",
+        "скачать",
+        "Одна страница: образование, преподавание, проекты, награды и навыки (на английском)."
+      ],
+      "resumeTitle": "Resume (PDF)"
+    }
+  }
+}
