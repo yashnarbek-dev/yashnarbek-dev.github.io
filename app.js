@@ -7,6 +7,15 @@
 
 const PREVIEW = new URLSearchParams(location.search).has("preview");
 const PREVIEW_KEY = "yg-preview";
+// admin password: only a PBKDF2 hash is stored (content.json "admin" can replace it)
+const DEFAULT_LOCK = { iter: 300000, salt: "107d09878cd512533ef660743aa9b8fa", hash: "cc7286a669ad61676e61a9801dab0c4b50ff873d704d22402038f7a36a312f8f" };
+const UNLOCK_KEY = "yg-admin-unlock";
+async function pbkdf2Hex(pw, saltHex, iter) {
+  const salt = new Uint8Array(saltHex.match(/../g).map(b => parseInt(b, 16)));
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations: iter }, key, 256);
+  return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
 const DEFAULT_ACCENT = "#5abb9a";
 
 let S = null;                 // content.json
@@ -488,7 +497,7 @@ const COMMANDS = {
   pwd: { run: () => esc(S.commands.pwd || "") },
   sudo: { run: () => `${esc(T().sudo)} <span class="muted">${esc(T().kidding)}</span>` },
   echo: { run: args => esc(args.join(" ")) },
-  admin: { run: () => { setTimeout(() => { location.href = "admin.html"; }, 500); return `<span class="muted">Opening</span> <a href="admin.html">admin.html</a> ...`; } },
+  admin: { run: () => { startPassword(); return null; } },
 };
 
 /* ================= about: photo decoded like a matrix ================= */
@@ -595,6 +604,43 @@ function reveal(block, stepMs = 55) {
 
 const promptHtml = () => `<span class="prompt"><span class="u">${esc(S.site.promptUser || "")}</span>:~$</span>`;
 
+/* ================= admin: ask for the password ================= */
+let pwMode = false, pwBusy = false;
+const promptLabel = document.querySelector("label.prompt");
+const pwLabel = () => T().adminPassword || "Password:";
+function startPassword() {
+  pwMode = true;
+  promptLabel.innerHTML = `<span class="u">${esc(pwLabel())}</span>`;
+  input.value = ""; input.type = "password"; input.setAttribute("aria-label", pwLabel());
+  enterHint.hidden = true;
+  setTimeout(() => input.focus({ preventScroll: true }), 0);
+}
+function endPassword() {
+  pwMode = false;
+  input.value = ""; input.type = "text"; input.setAttribute("aria-label", "Type a command");
+  promptLabel.innerHTML = `<span class="u" id="prompt-user">${esc(S.site.promptUser || "")}</span>:~$`;
+}
+async function submitPassword() {
+  if (pwBusy) return;
+  const pw = input.value;
+  say(`<span class="prompt"><span class="u">${esc(pwLabel())}</span></span>`, "block echo");
+  endPassword();
+  pwBusy = true; input.disabled = true;
+  const lock = S.admin && S.admin.hash && S.admin.salt ? S.admin : DEFAULT_LOCK;
+  let ok = false;
+  try { ok = !!pw && (await pbkdf2Hex(pw, lock.salt, lock.iter || 300000)) === lock.hash; } catch (e) {}
+  if (!ok) await new Promise(r => setTimeout(r, 600));
+  pwBusy = false; input.disabled = false;
+  if (ok) {
+    try { sessionStorage.setItem(UNLOCK_KEY, lock.hash); } catch (e) {}
+    say(`<span class="acc">${esc(T().adminGranted || "Access granted.")}</span>`);
+    setTimeout(() => { location.href = "admin.html"; }, 700);
+  } else {
+    say(`<span class="pink">${esc(T().adminDenied || "Access denied.")}</span>`);
+    input.focus({ preventScroll: true });
+  }
+}
+
 function goHome() {
   out.innerHTML = "";
   reveal(say(welcome(true)));
@@ -604,6 +650,7 @@ function goHome() {
 }
 
 function run(raw, opts = {}) {
+  if (pwMode) endPassword();
   const text = raw.trim();
   const [name0 = "", ...args] = text.split(/\s+/);
   const name = ALIASES[name0.toLowerCase()] || name0.toLowerCase();
@@ -658,6 +705,16 @@ async function suggest(text) {
 input.addEventListener("input", () => { suggestId++; enterHint.hidden = true; });
 
 input.addEventListener("keydown", e => {
+  if (pwMode) {
+    if (e.key === "Enter") { e.preventDefault(); submitPassword(); }
+    else if (e.key === "Escape" || (e.ctrlKey && e.key.toLowerCase() === "c")) {
+      e.preventDefault();
+      say(`<span class="prompt"><span class="u">${esc(pwLabel())}</span></span> ^C`, "block echo");
+      endPassword();
+    }
+    else if (e.key === "Tab" || e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault();
+    return;
+  }
   if (e.key === "Enter") { suggestId++; enterHint.hidden = true; run(input.value); input.value = ""; }
   else if (e.key === "Tab") { e.preventDefault(); complete(); }
   else if (e.key === "ArrowUp") { e.preventDefault(); if (histPos > 0) input.value = cmdHistory[--histPos]; }

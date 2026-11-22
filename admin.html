@@ -294,12 +294,28 @@
 </head>
 <body>
 
+<!-- password -->
+<div class="login" id="lock" hidden>
+  <div class="login-card" style="max-width:420px">
+    <div class="brand"><span class="dot"></span>admin<span class="sub">/ portfolio</span></div>
+    <h1>Admin password</h1>
+    <p class="lead">This area is only for the site owner.</p>
+    <form id="lock-form" autocomplete="off">
+      <label class="field"><span class="flabel">Password</span>
+        <input type="password" id="lock-pw" autocomplete="current-password" required></label>
+      <div class="row"><button class="btn primary" type="submit" id="lock-btn">Unlock</button>
+        <a class="btn ghost" href="./">Back to the site</a></div>
+      <div class="err" id="lock-err" role="alert"></div>
+    </form>
+  </div>
+</div>
+
 <!-- sign in -->
 <div class="login" id="login" hidden>
   <div class="login-card">
     <div class="brand"><span class="dot"></span>admin<span class="sub">/ portfolio</span></div>
-    <h1>Sign in to edit your site</h1>
-    <p class="lead">Changes are saved straight to your GitHub repository, and the site updates about a minute after you publish.</p>
+    <h1>Connect to GitHub</h1>
+    <p class="lead">One time per device: the panel needs a GitHub token to save your changes to the site. After that, the password is all you need on this device.</p>
     <ol class="steps">
       <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → new fine-grained token</a>.</li>
       <li>Repository access: <b>Only select repositories</b> → <b id="repo-name-hint">your site repo</b>.</li>
@@ -320,12 +336,10 @@
       <div class="row">
         <label class="toggle"><input type="checkbox" id="remember" checked><span class="sw"></span><span class="tt"><b>Keep me signed in on this device</b></span></label>
       </div>
-      <div class="row"><button class="btn primary" type="submit" id="login-btn">Sign in</button></div>
+      <div class="row"><button class="btn primary" type="submit" id="login-btn">Connect</button></div>
       <div class="err" id="login-err" role="alert"></div>
     </form>
-    <div class="or-line">or</div>
-    <button class="btn" id="offline-btn" type="button">Edit without signing in</button>
-    <p class="safe">Without a token you can still edit, preview and download <code>content.json</code>, but not publish. The token is stored only in this browser and is sent only to api.github.com. Nobody can change the site without one.</p>
+    <p class="safe">The token is stored only in this browser and is sent only to api.github.com.</p>
   </div>
 </div>
 

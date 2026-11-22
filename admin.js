@@ -7,6 +7,18 @@
 
 const DRAFT_KEY = "yg-admin-draft", PREVIEW_KEY = "yg-preview", AUTH_KEY = "yg-admin-auth", PREF_KEY = "yg-admin-prefs";
 const FALLBACK_REPO = { owner: "yashnarbek-dev", repo: "yashnarbek-dev.github.io", branch: "main" };
+// admin password: only a PBKDF2 hash is stored (content.json "admin" can replace it; same default as app.js)
+const DEFAULT_LOCK = { iter: 300000, salt: "107d09878cd512533ef660743aa9b8fa", hash: "cc7286a669ad61676e61a9801dab0c4b50ff873d704d22402038f7a36a312f8f" };
+const UNLOCK_KEY = "yg-admin-unlock";
+async function pbkdf2Hex(pw, saltHex, iter) {
+  const salt = new Uint8Array(saltHex.match(/../g).map(b => parseInt(b, 16)));
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations: iter }, key, 256);
+  return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, "0")).join("");
+const validLock = l => l && typeof l === "object" && /^[0-9a-f]{16,}$/.test(l.salt || "") && /^[0-9a-f]{64}$/.test(l.hash || "") ? l : null;
+let publishedLock = DEFAULT_LOCK;
 
 const $ = id => document.getElementById(id);
 const clone = v => JSON.parse(JSON.stringify(v));
@@ -760,6 +772,8 @@ const SECTIONS = [
         lf("Prompt hint after “clear”", "pressEnter"), lf("Empty history", "noHistory"))),
       group("whoami", "Shown as: <i>[1]</i> <i>[2]</i> <code>[about]</code><i>[3]</i>", fields3(lf("1", ["whoami", 0]), lf("2", ["whoami", 1]), lf("3", ["whoami", 2]))),
       group("sudo", null, fields(lf("Message", "sudo", { wide: true }), lf("After it", "kidding"))),
+      group("admin password prompt", "What the terminal shows after someone types <code>admin</code>.", fields3(
+        lf("Prompt", "adminPassword"), lf("Wrong password", "adminDenied"), lf("Right password", "adminGranted"))),
     ] },
   { id: "boot", title: "Boot screen", preview: "", keywords: "boot animation ssh loading start",
     desc: "The fake SSH login that plays before the home screen.",
@@ -788,7 +802,8 @@ const I18N_ROUTE = { label: "languages", or: "messages", welcome: "home", typeHe
   contactMe: "home", extras: "home", language: "home", hint: "home", pressEnter: "messages", keys: "messages", allAtOnce: "messages", notFound: "messages",
   desc: "commands", tag: "about", beats: "about", andYou: "about", whoami: "messages", sudo: "messages", kidding: "messages", resumeSoon: "resume",
   resumeLinks: "resume", resumeTitle: "resume", allCode: "projects", noHistory: "messages", teaching: "teaching", achievements: "achievements",
-  skills: "skills", misc: "misc", mathbook: "mathbook", neofetch: "neofetch", copy: "profile", scan: "about", chessT: "chess", music: "music" };
+  skills: "skills", misc: "misc", mathbook: "mathbook", neofetch: "neofetch", copy: "profile", scan: "about", chessT: "chess", music: "music",
+  adminPassword: "messages", adminDenied: "messages", adminGranted: "messages" };
 function sectionFor(p) {
   const [a, b] = p;
   switch (a) {
@@ -805,6 +820,7 @@ function sectionFor(p) {
     case "chess": return "chess";
     case "custom": return "custom";
     case "i18n": return p.length < 3 ? "languages" : I18N_ROUTE[p[2]] || "messages";
+    case "admin": return "settings";
     default: return "json";
   }
 }
@@ -1056,14 +1072,42 @@ function secSettings() {
               if (changedIds.size) { const ok = await dialog("Reload from GitHub?", "Your unpublished changes will be replaced with the version on GitHub.", [{ label: "Cancel", value: false }, { label: "Reload", kind: "danger", value: true }]); if (!ok) return; }
               store.del(DRAFT_KEY); pending = {}; await loadRemote(true);
             }, "small"),
-            btn("Sign out", () => { store.del(AUTH_KEY); location.reload(); }, "small danger")))
-      : h("div", null, h("p", { style: "margin:0 0 12px" }, "You're editing without signing in, so you can't publish. Download content.json from Raw JSON, or sign in."),
-          btn("Sign in", () => { location.reload(); }, "primary small"))),
+            btn("Disconnect GitHub on this device", () => { store.del(AUTH_KEY); lockAndLeave(); }, "small danger")))
+      : null),
+    group("Admin password", "Asked when someone types <code>admin</code> in the terminal or opens this page. Only a scrambled hash of it is saved on the site.",
+      passwordChanger()),
     group("Your site", null, h("p", { style: "margin:0" }, "Live site: ", h("a", { href: live, target: "_blank", rel: "noopener" }, live), h("br"),
       "This panel: ", h("a", { href: live + "admin", target: "_blank", rel: "noopener" }, live + "admin"), h("br"),
-      h("span", { class: "help" }, "Visitors can also type admin in the terminal to get here (switch the admin command off in Commands & menu to hide it)."))),
+      h("span", { class: "help" }, "You can also type admin in the terminal. Switch the admin command off in Commands & menu to hide it."))),
+    group("Leave", null, btn("Lock the admin panel", lockAndLeave, "small")),
     group("Keyboard shortcuts", null, h("div", { class: "help", html: "<kbd>/</kbd> search · <kbd>Ctrl</kbd>+<kbd>S</kbd> publish · <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo · <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> redo" })),
   ];
+}
+
+function passwordChanger() {
+  const a = h("input", { type: "password", autocomplete: "new-password", "aria-label": "New password" });
+  const b = h("input", { type: "password", autocomplete: "new-password", "aria-label": "Repeat new password" });
+  const note = h("span", { class: "help" }, validLock(state.admin) && state.admin.hash !== publishedLock.hash ? "A new password is waiting to be published." : "");
+  const save = btn("Change password", async () => {
+    if (a.value.length < 8) return toast("Use at least 8 characters.", "err");
+    if (a.value !== b.value) return toast("The two passwords don't match.", "err");
+    const salt = randomHex(16), iter = 300000;
+    const hash = await pbkdf2Hex(a.value, salt, iter);
+    state.admin = { iter, salt, hash };
+    a.value = b.value = "";
+    changed();
+    note.textContent = "A new password is waiting to be published.";
+    toast("New password set. Publish to make it active.", "ok", 6000);
+  }, "small");
+  return h("div", null,
+    h("div", { class: "fields" },
+      h("label", { class: "field" }, h("span", { class: "flabel" }, "New password"), a),
+      h("label", { class: "field" }, h("span", { class: "flabel" }, "Repeat it"), b)),
+    h("div", { style: "display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap" }, save, note));
+}
+function lockAndLeave() {
+  try { sessionStorage.removeItem(UNLOCK_KEY); } catch (e) {}
+  location.href = "./";
 }
 
 /* ================= rendering ================= */
@@ -1133,7 +1177,7 @@ function searchAll(q) {
     else if (Array.isArray(v)) v.forEach((x, i) => walk(x, [...p, i]));
     else if (v && typeof v === "object") for (const k of Object.keys(v)) walk(v[k], [...p, k]);
   };
-  for (const k of Object.keys(state)) if (!["meta", "version", "theme"].includes(k)) walk(state[k], [k]);
+  for (const k of Object.keys(state)) if (!["meta", "version", "theme", "admin"].includes(k)) walk(state[k], [k]);
   return out.slice(0, 60);
 }
 function langOfPath(p) {
@@ -1237,12 +1281,7 @@ async function startEditing(content, sha, fresh) {
 /* ================= publish ================= */
 async function openPublish() {
   if (publishing) return;
-  if (!auth) {
-    const v = await dialog("Sign in to publish", "You're editing without a GitHub token. Download content.json and upload it to the repository yourself, or sign in.",
-      [{ label: "Cancel", value: 0 }, { label: "Download content.json", value: 1 }, { label: "Sign in", kind: "primary", value: 2 }]);
-    if (v === 1) { current = "json"; renderAll(); } else if (v === 2) location.reload();
-    return;
-  }
+  if (!auth) return;
   const secs = [...changedIds].filter(id => id !== "files").map(titleOf);
   const files = Object.keys(pending);
   if (!secs.length && !files.length) return toast("Nothing to publish. Everything is already online.");
@@ -1302,6 +1341,10 @@ async function runPublish(message) {
     baseSha = entry ? entry.sha : null;
     base = JSON.stringify(state);
     Object.assign(recent, pending);
+    if (validLock(state.admin) && state.admin.hash !== publishedLock.hash) {   // new password is live: keep this session unlocked
+      publishedLock = state.admin;
+      try { sessionStorage.setItem(UNLOCK_KEY, state.admin.hash); } catch (e) {}
+    }
     pending = {};
     store.del(DRAFT_KEY);
     publishing = false;
@@ -1347,9 +1390,13 @@ async function watchLive(stamp) {
 }
 
 /* ================= boot ================= */
-function showApp() { $("login").hidden = true; $("app").hidden = false; }
+function showApp() { $("lock").hidden = true; $("login").hidden = true; $("app").hidden = false; }
+function showLock() {
+  $("app").hidden = true; $("login").hidden = true; $("lock").hidden = false;
+  $("lock-pw").focus();
+}
 function showLogin(err) {
-  $("app").hidden = true; $("login").hidden = false;
+  $("app").hidden = true; $("lock").hidden = true; $("login").hidden = false;
   const r = (auth && auth.owner) ? auth : detectRepo();
   $("owner").value = r.owner; $("repo").value = r.repo; $("branch").value = r.branch || "main";
   const sum = () => { $("repo-summary").textContent = `${$("owner").value}/${$("repo").value} (${$("branch").value || "main"})`; $("repo-name-hint").textContent = $("repo").value || "your site repo"; };
@@ -1389,18 +1436,23 @@ function wireUi() {
   $("login-form").addEventListener("submit", async e => {
     e.preventDefault();
     const b = $("login-btn");
-    b.disabled = true; b.textContent = "Signing in…"; $("login-err").textContent = "";
+    b.disabled = true; b.textContent = "Connecting…"; $("login-err").textContent = "";
     try { await signIn($("token").value.trim(), $("owner").value.trim(), $("repo").value.trim(), $("branch").value.trim(), $("remember").checked); }
     catch (err) { auth = null; $("login-err").textContent = err.message; }
-    finally { b.disabled = false; b.textContent = "Sign in"; }
+    finally { b.disabled = false; b.textContent = "Connect"; }
   });
-  $("offline-btn").addEventListener("click", async () => {
-    try {
-      const r = await fetch("content.json?v=" + Date.now(), { cache: "no-store" });
-      if (!r.ok) throw new Error("content.json: HTTP " + r.status);
-      await startEditing(await r.json(), null);
-      toast("Editing without signing in. You can preview and download, but not publish.");
-    } catch (e) { $("login-err").textContent = "Couldn't load content.json: " + e.message; }
+  $("lock-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const b = $("lock-btn"), pw = $("lock-pw").value;
+    b.disabled = true; b.textContent = "Checking…"; $("lock-err").textContent = "";
+    let ok = false;
+    try { ok = !!pw && (await pbkdf2Hex(pw, publishedLock.salt, publishedLock.iter || 300000)) === publishedLock.hash; } catch (err) {}
+    if (!ok) await sleep(600);
+    b.disabled = false; b.textContent = "Unlock";
+    if (!ok) { $("lock-err").textContent = "Wrong password."; $("lock-pw").select(); return; }
+    try { sessionStorage.setItem(UNLOCK_KEY, publishedLock.hash); } catch (err) {}
+    $("lock-pw").value = "";
+    afterUnlock();
   });
   $("publish-btn").addEventListener("click", openPublish);
   $("undo-btn").addEventListener("click", undo);
@@ -1447,10 +1499,7 @@ function wireUi() {
   });
 }
 
-(async () => {
-  wireUi();
-  current = prefs.section && SECTIONS.some(s => s.id === prefs.section) ? prefs.section : "profile";
-  if (prefs.lang) editLang = prefs.lang;
+async function afterUnlock() {
   const saved = store.get(AUTH_KEY);
   if (saved && saved.token) {
     auth = saved;
@@ -1463,4 +1512,19 @@ function wireUi() {
     }
   }
   showLogin();
+}
+
+(async () => {
+  wireUi();
+  current = prefs.section && SECTIONS.some(s => s.id === prefs.section) ? prefs.section : "profile";
+  if (prefs.lang) editLang = prefs.lang;
+  // the password hash comes from the published content.json, so a changed password works everywhere
+  try {
+    const r = await fetch("content.json?v=" + Date.now(), { cache: "no-store" });
+    if (r.ok) publishedLock = validLock((await r.json()).admin) || DEFAULT_LOCK;
+  } catch (e) {}
+  let unlocked = null;
+  try { unlocked = sessionStorage.getItem(UNLOCK_KEY); } catch (e) {}
+  if (unlocked && unlocked === publishedLock.hash) afterUnlock();
+  else showLock();
 })();

@@ -3,6 +3,11 @@
   "meta": {
     "updatedAt": ""
   },
+  "admin": {
+    "iter": 300000,
+    "salt": "107d09878cd512533ef660743aa9b8fa",
+    "hash": "cc7286a669ad61676e61a9801dab0c4b50ff873d704d22402038f7a36a312f8f"
+  },
   "site": {
     "title": "Yashnarbek G'ofirjonov's Portfolio",
     "description": "Yashnarbek G'ofirjonov: 17, from Asaka, Uzbekistan. Self-taught developer and coding teacher, heading into Computer Science and cybersecurity.",
@@ -737,7 +742,10 @@
         "download",
         "One page: education, teaching, projects, honors and skills."
       ],
-      "resumeTitle": "Resume (PDF)"
+      "resumeTitle": "Resume (PDF)",
+      "adminPassword": "Password:",
+      "adminDenied": "Access denied.",
+      "adminGranted": "Access granted. Opening the admin panel..."
     },
     "uz": {
       "label": "O'zbekcha",
@@ -981,7 +989,10 @@
         "yuklab olish",
         "Bir sahifa: ta'lim, o'qituvchilik, loyihalar, yutuqlar va ko'nikmalar (ingliz tilida)."
       ],
-      "resumeTitle": "Resume (PDF)"
+      "resumeTitle": "Resume (PDF)",
+      "adminPassword": "Parol:",
+      "adminDenied": "Kirish rad etildi.",
+      "adminGranted": "Kirish ruxsat etildi. Admin panel ochilmoqda..."
     },
     "ru": {
       "label": "Русский",
@@ -1225,7 +1236,10 @@
         "скачать",
         "Одна страница: образование, преподавание, проекты, награды и навыки (на английском)."
       ],
-      "resumeTitle": "Resume (PDF)"
+      "resumeTitle": "Resume (PDF)",
+      "adminPassword": "Пароль:",
+      "adminDenied": "Доступ запрещён.",
+      "adminGranted": "Доступ разрешён. Открываю админ-панель..."
     }
   }
 }
