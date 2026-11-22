@@ -6,7 +6,13 @@
   "admin": {
     "iter": 300000,
     "salt": "107d09878cd512533ef660743aa9b8fa",
-    "hash": "cc7286a669ad61676e61a9801dab0c4b50ff873d704d22402038f7a36a312f8f"
+    "hash": "cc7286a669ad61676e61a9801dab0c4b50ff873d704d22402038f7a36a312f8f",
+    "vault": {
+      "iter": 600000,
+      "salt": "47f5f8804236b6911d9392e66e60c86a",
+      "iv": "fd1f5b3591091ce1d3afb88a",
+      "data": "yG91UGt1m7gc9jAFnpRiqvB54qDb1rX7bzisgkJxtIf8D8pErM6OFPCt+zwDKYq8K/sf1eXeF2an7YzqRDquKUXWXa6trmIyfDIAtBfmbFQvz5nTz/sBo0qEPQvFUHm91kxj76fwZS4XZslIX/g3KLoXYJOO5FvLUPgk20Ts8RQz+RkZIiBnhY9/cy46EpaYloQnn0ZJ4ne80zJljCyQdtloDJAA2gVFyEp2ulyPQ/7CZka8LoL4fLu1uhzpyCagXtKAFBt5EBlfhN8f5WNxubx0tfE0PxMgdjUEkg=="
+    }
   },
   "site": {
     "title": "Yashnarbek G'ofirjonov's Portfolio",
