@@ -19,6 +19,32 @@ async function pbkdf2Hex(pw, saltHex, iter) {
 const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, "0")).join("");
 const validLock = l => l && typeof l === "object" && /^[0-9a-f]{16,}$/.test(l.salt || "") && /^[0-9a-f]{64}$/.test(l.hash || "") ? l : null;
 let publishedLock = DEFAULT_LOCK;
+let unlockPw = null;                         // the admin password, kept in memory only while this page is open
+const PW_HANDOFF = "yg-admin-pw";            // one-time hand-off from the terminal's "admin" command
+
+// The GitHub token is saved on the site encrypted with the admin password (AES-256-GCM, key from PBKDF2-SHA256),
+// so the password alone unlocks publishing on any device.
+const VAULT_ITER = 600000;
+const hexBytes = hx => new Uint8Array(hx.match(/../g).map(b => parseInt(b, 16)));
+const bytesB64 = buf => { const b = new Uint8Array(buf); let s = ""; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); };
+const b64Bytes = s => Uint8Array.from(atob(s), ch => ch.charCodeAt(0));
+async function vaultKey(pw, saltHex, iter) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({ name: "PBKDF2", hash: "SHA-256", salt: hexBytes(saltHex), iterations: iter }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+async function makeVault(pw, payload) {
+  const salt = randomHex(16), iv = randomHex(12);
+  const key = await vaultKey(pw, salt, VAULT_ITER);
+  const data = await crypto.subtle.encrypt({ name: "AES-GCM", iv: hexBytes(iv) }, key, new TextEncoder().encode(JSON.stringify(payload)));
+  return { iter: VAULT_ITER, salt, iv, data: bytesB64(data) };
+}
+async function openVault(pw, v) {
+  const key = await vaultKey(pw, v.salt, v.iter || VAULT_ITER);
+  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: hexBytes(v.iv) }, key, b64Bytes(v.data));
+  return JSON.parse(new TextDecoder().decode(plain));
+}
+const validVault = v => v && typeof v === "object" && v.salt && v.iv && v.data ? v : null;
+const vaultPayload = () => ({ token: auth.token, owner: auth.owner, repo: auth.repo, branch: auth.branch, user: auth.user || "" });
 
 const $ = id => document.getElementById(id);
 const clone = v => JSON.parse(JSON.stringify(v));
@@ -1066,15 +1092,18 @@ function secSettings() {
   return [
     group("GitHub", null, auth
       ? h("div", null,
-          h("p", { style: "margin:0 0 12px" }, "Signed in", auth.user ? [" as ", h("b", null, "@" + auth.user)] : null, " to ", h("a", { href: repoUrl, target: "_blank", rel: "noopener", class: "mono" }, `${auth.owner}/${auth.repo}`), ` (branch ${auth.branch}).`),
+          h("p", { style: "margin:0 0 6px" }, "Connected", auth.user ? [" as ", h("b", null, "@" + auth.user)] : null, " to ", h("a", { href: repoUrl, target: "_blank", rel: "noopener", class: "mono" }, `${auth.owner}/${auth.repo}`), ` (branch ${auth.branch}).`),
+          h("p", { class: "help", style: "margin:0 0 12px" }, validVault(publishedLock.vault)
+            ? "Your GitHub token is saved on the site, encrypted with your admin password, so the password is all you need on any device."
+            : "Your GitHub token isn't saved on the site yet."),
           h("div", { style: "display:flex;gap:8px;flex-wrap:wrap" },
             btn("Reload from GitHub", async () => {
               if (changedIds.size) { const ok = await dialog("Reload from GitHub?", "Your unpublished changes will be replaced with the version on GitHub.", [{ label: "Cancel", value: false }, { label: "Reload", kind: "danger", value: true }]); if (!ok) return; }
               store.del(DRAFT_KEY); pending = {}; await loadRemote(true);
             }, "small"),
-            btn("Disconnect GitHub on this device", () => { store.del(AUTH_KEY); lockAndLeave(); }, "small danger")))
+            btn("Use a different GitHub token", replaceToken, "small")))
       : null),
-    group("Admin password", "Asked when someone types <code>admin</code> in the terminal or opens this page. Only a scrambled hash of it is saved on the site.",
+    group("Admin password", "Asked when someone types <code>admin</code> in the terminal or opens this page. It also unlocks your saved GitHub token. Only a scrambled hash of it is saved on the site.",
       passwordChanger()),
     group("Your site", null, h("p", { style: "margin:0" }, "Live site: ", h("a", { href: live, target: "_blank", rel: "noopener" }, live), h("br"),
       "This panel: ", h("a", { href: live + "admin", target: "_blank", rel: "noopener" }, live + "admin"), h("br"),
@@ -1089,15 +1118,20 @@ function passwordChanger() {
   const b = h("input", { type: "password", autocomplete: "new-password", "aria-label": "Repeat new password" });
   const note = h("span", { class: "help" }, validLock(state.admin) && state.admin.hash !== publishedLock.hash ? "A new password is waiting to be published." : "");
   const save = btn("Change password", async () => {
-    if (a.value.length < 8) return toast("Use at least 8 characters.", "err");
+    if (a.value.length < 10) return toast("Use at least 10 characters. A long password protects your saved GitHub token.", "err", 6000);
     if (a.value !== b.value) return toast("The two passwords don't match.", "err");
-    const salt = randomHex(16), iter = 300000;
-    const hash = await pbkdf2Hex(a.value, salt, iter);
-    state.admin = { iter, salt, hash };
-    a.value = b.value = "";
-    changed();
-    note.textContent = "A new password is waiting to be published.";
-    toast("New password set. Publish to make it active.", "ok", 6000);
+    if (!auth) return toast("Connect to GitHub first.", "err");
+    save.disabled = true;
+    try {
+      const salt = randomHex(16), iter = VAULT_ITER;
+      const hash = await pbkdf2Hex(a.value, salt, iter);
+      const vault = await makeVault(a.value, vaultPayload());   // the saved token moves to the new password
+      state.admin = { iter, salt, hash, vault };
+      a.value = b.value = "";
+      changed();
+      note.textContent = "A new password is waiting to be published.";
+      toast("New password set. Publish to make it active.", "ok", 6000);
+    } finally { save.disabled = false; }
   }, "small");
   return h("div", null,
     h("div", { class: "fields" },
@@ -1106,8 +1140,35 @@ function passwordChanger() {
     h("div", { style: "display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap" }, save, note));
 }
 function lockAndLeave() {
-  try { sessionStorage.removeItem(UNLOCK_KEY); } catch (e) {}
+  try { sessionStorage.removeItem(UNLOCK_KEY); sessionStorage.removeItem(AUTH_KEY); } catch (e) {}
+  unlockPw = null;
   location.href = "./";
+}
+async function replaceToken() {
+  if (validLock(state.admin) && state.admin.hash !== publishedLock.hash) return toast("Publish your new password first.", "err");
+  const tok = h("input", { type: "password", class: "mono", placeholder: "github_pat_...", "aria-label": "New GitHub token" });
+  const pw = h("input", { type: "password", "aria-label": "Admin password" });
+  const body = h("div", null, h("p", { style: "margin:0 0 12px" }, "The new token replaces the saved one for every device."),
+    h("div", { class: "fields one" },
+      h("label", { class: "field" }, h("span", { class: "flabel" }, "New GitHub token"), tok),
+      h("label", { class: "field" }, h("span", { class: "flabel" }, "Admin password"), pw)));
+  if (!await dialog("Use a different GitHub token", body, [{ label: "Cancel", value: false }, { label: "Save token", kind: "primary", value: true }], { focus: tok })) return;
+  try {
+    if ((await pbkdf2Hex(pw.value, publishedLock.salt, publishedLock.iter || 300000)) !== publishedLock.hash) throw new Error("Wrong admin password.");
+    const old = auth;
+    auth = { ...old, token: tok.value.trim() };
+    try { await gh(repoPath()); try { auth.user = (await gh("/user")).login; } catch (e) {} }
+    catch (e) { auth = old; throw e; }
+    unlockPw = pw.value;
+    const saved = await saveVaultRemote(await makeVault(pw.value, vaultPayload()));
+    store.set(AUTH_KEY, auth, true);
+    const b = JSON.parse(base); b.admin = saved.admin; base = JSON.stringify(normalize(b));
+    baseSha = saved.sha;
+    state.admin = clone(saved.admin);
+    publishedLock = saved.admin;
+    changed(); renderSection();
+    toast("New token saved.", "ok");
+  } catch (e) { toast(e.message, "err", 7000); }
 }
 
 /* ================= rendering ================= */
@@ -1267,6 +1328,8 @@ async function startEditing(content, sha, fresh) {
       [{ label: "Discard them", kind: "danger", value: false }, { label: "Restore", kind: "primary", value: true }]);
     if (ok) {
       state = normalize(draft.content); pending = draft.pending || {};
+      // keep the newest saved token unless the draft holds a password change of its own
+      if (!state.admin || !loaded.admin || state.admin.hash === loaded.admin.hash) state.admin = clone(loaded.admin);
       if (draft.baseSha && sha && draft.baseSha !== sha) toast("Heads up: the site was changed elsewhere after this draft was made. Publishing will overwrite those changes.", "err", 9000);
     } else store.del(DRAFT_KEY);
   }
@@ -1320,6 +1383,10 @@ async function runPublish(message) {
     }
     const stamp = new Date().toISOString();
     state.meta = { ...(state.meta || {}), updatedAt: stamp };
+    // never publish without the password lock / saved token (e.g. after importing an old backup)
+    const pubAdmin = JSON.parse(base).admin;
+    if (!validLock(state.admin)) state.admin = clone(pubAdmin || publishedLock);
+    else if (!validVault(state.admin.vault) && pubAdmin && validVault(pubAdmin.vault) && state.admin.hash === pubAdmin.hash) state.admin.vault = clone(pubAdmin.vault);
     const files = [{ path: "content.json", b64: utf8ToB64(JSON.stringify(state, null, 2) + "\n") },
       ...Object.entries(pending).map(([path, f]) => ({ path, b64: f.b64 }))];
     s = step(`Uploading ${files.length} file${files.length > 1 ? "s" : ""}`);
@@ -1341,9 +1408,10 @@ async function runPublish(message) {
     baseSha = entry ? entry.sha : null;
     base = JSON.stringify(state);
     Object.assign(recent, pending);
-    if (validLock(state.admin) && state.admin.hash !== publishedLock.hash) {   // new password is live: keep this session unlocked
-      publishedLock = state.admin;
-      try { sessionStorage.setItem(UNLOCK_KEY, state.admin.hash); } catch (e) {}
+    if (validLock(state.admin)) {
+      // a new password is live: keep this session unlocked
+      if (state.admin.hash !== publishedLock.hash) { try { sessionStorage.setItem(UNLOCK_KEY, state.admin.hash); } catch (e) {} }
+      publishedLock = clone(state.admin);
     }
     pending = {};
     store.del(DRAFT_KEY);
@@ -1405,15 +1473,68 @@ function showLogin(err) {
   $("token").focus();
 }
 
-async function signIn(token, owner, repo, branch, remember) {
+function setLockBusy(on) {
+  $("lock-btn").disabled = !!on; $("lock-pw").disabled = !!on;
+  $("lock-btn").textContent = on ? "Unlocking…" : "Unlock";
+}
+async function checkPw(pw) {
+  try { return !!pw && (await pbkdf2Hex(pw, publishedLock.salt, publishedLock.iter || 300000)) === publishedLock.hash; }
+  catch (e) { return false; }
+}
+
+// saves the encrypted token into content.json on GitHub right away (one small commit)
+async function saveVaultRemote(vault) {
+  const f = await gh(`${repoPath()}/contents/content.json?ref=${encodeURIComponent(auth.branch)}`);
+  const remote = JSON.parse(b64ToUtf8(f.content || (await gh(`${repoPath()}/git/blobs/${f.sha}`)).content));
+  const lock = validLock(remote.admin) || publishedLock;
+  if (lock.hash !== publishedLock.hash) throw new Error("The admin password was changed somewhere else. Reload this page and try again.");
+  remote.admin = { ...lock, vault };
+  const r = await gh(`${repoPath()}/contents/content.json`, { method: "PUT", body: JSON.stringify({
+    message: "Save the encrypted admin key (admin panel)", content: utf8ToB64(JSON.stringify(remote, null, 2) + "\n"), sha: f.sha, branch: auth.branch }) });
+  return { admin: remote.admin, sha: r.content.sha };
+}
+
+async function connectToken(token, owner, repo, branch) {
   auth = { token, owner, repo, branch };
   const info = await gh(repoPath());
   if (info.permissions && info.permissions.push === false) throw new Error("Your account can't write to this repository.");
   auth.branch = branch || info.default_branch || "main";
   try { auth.user = (await gh("/user")).login; } catch (e) {}
-  store.del(AUTH_KEY);
-  store.set(AUTH_KEY, auth, !remember);
+  const saved = await saveVaultRemote(await makeVault(unlockPw, vaultPayload()));   // also proves the token can write
+  publishedLock = saved.admin;
+  store.set(AUTH_KEY, auth, true);
   await loadRemote();
+  toast("Connected. From now on the password is all you need, on any device.", "ok", 8000);
+}
+
+async function openEditor() {
+  try { await loadRemote(); }
+  catch (e) {
+    const dead = e.status === 401 || e.status === 404;
+    if (dead) store.del(AUTH_KEY);
+    showLogin(e.status === 401 ? "The saved GitHub token stopped working (it expired or was revoked). Paste a new one." : e.message);
+  }
+}
+
+// the password was right: open the saved token, or ask for one the first time
+async function afterPassword(pw) {
+  unlockPw = pw;
+  try { sessionStorage.setItem(UNLOCK_KEY, publishedLock.hash); } catch (e) {}
+  let legacy = null;
+  try { legacy = JSON.parse(localStorage.getItem(AUTH_KEY)); localStorage.removeItem(AUTH_KEY); } catch (e) {}
+  const v = validVault(publishedLock.vault);
+  if (v) {
+    let saved = null;
+    try { saved = await openVault(pw, v); } catch (e) {}
+    if (!saved || !saved.token) return showLogin("Your saved GitHub token couldn't be opened. Paste a token to save it again.");
+    auth = { token: saved.token, owner: saved.owner, repo: saved.repo, branch: saved.branch || "main", user: saved.user };
+    store.set(AUTH_KEY, auth, true);
+    return openEditor();
+  }
+  if (legacy && legacy.token) {   // a token remembered by an earlier version of this panel: save it to the site
+    try { await connectToken(legacy.token, legacy.owner, legacy.repo, legacy.branch); return; } catch (e) { auth = null; }
+  }
+  showLogin();
 }
 
 const narrowScreen = () => matchMedia("(max-width: 1180px)").matches;
@@ -1437,22 +1558,27 @@ function wireUi() {
     e.preventDefault();
     const b = $("login-btn");
     b.disabled = true; b.textContent = "Connecting…"; $("login-err").textContent = "";
-    try { await signIn($("token").value.trim(), $("owner").value.trim(), $("repo").value.trim(), $("branch").value.trim(), $("remember").checked); }
+    try {
+      if (!unlockPw) { showLock(); return; }
+      await connectToken($("token").value.trim(), $("owner").value.trim(), $("repo").value.trim(), $("branch").value.trim());
+      $("token").value = "";
+    }
     catch (err) { auth = null; $("login-err").textContent = err.message; }
     finally { b.disabled = false; b.textContent = "Connect"; }
   });
   $("lock-form").addEventListener("submit", async e => {
     e.preventDefault();
-    const b = $("lock-btn"), pw = $("lock-pw").value;
-    b.disabled = true; b.textContent = "Checking…"; $("lock-err").textContent = "";
-    let ok = false;
-    try { ok = !!pw && (await pbkdf2Hex(pw, publishedLock.salt, publishedLock.iter || 300000)) === publishedLock.hash; } catch (err) {}
-    if (!ok) await sleep(600);
-    b.disabled = false; b.textContent = "Unlock";
-    if (!ok) { $("lock-err").textContent = "Wrong password."; $("lock-pw").select(); return; }
-    try { sessionStorage.setItem(UNLOCK_KEY, publishedLock.hash); } catch (err) {}
+    const pw = $("lock-pw").value;
+    setLockBusy(true); $("lock-err").textContent = "";
+    if (!await checkPw(pw)) {
+      await sleep(600);
+      setLockBusy(false);
+      $("lock-err").textContent = "Wrong password."; $("lock-pw").select();
+      return;
+    }
     $("lock-pw").value = "";
-    afterUnlock();
+    await afterPassword(pw);
+    setLockBusy(false);
   });
   $("publish-btn").addEventListener("click", openPublish);
   $("undo-btn").addEventListener("click", undo);
@@ -1499,21 +1625,6 @@ function wireUi() {
   });
 }
 
-async function afterUnlock() {
-  const saved = store.get(AUTH_KEY);
-  if (saved && saved.token) {
-    auth = saved;
-    try { await loadRemote(); return; }
-    catch (e) {
-      const msg = e.status === 401 ? "Your token expired or was revoked. Please sign in again." : e.message;
-      if (e.status === 401) { store.del(AUTH_KEY); auth = null; }
-      showLogin(msg);
-      return;
-    }
-  }
-  showLogin();
-}
-
 (async () => {
   wireUi();
   current = prefs.section && SECTIONS.some(s => s.id === prefs.section) ? prefs.section : "profile";
@@ -1523,8 +1634,20 @@ async function afterUnlock() {
     const r = await fetch("content.json?v=" + Date.now(), { cache: "no-store" });
     if (r.ok) publishedLock = validLock((await r.json()).admin) || DEFAULT_LOCK;
   } catch (e) {}
-  let unlocked = null;
-  try { unlocked = sessionStorage.getItem(UNLOCK_KEY); } catch (e) {}
-  if (unlocked && unlocked === publishedLock.hash) afterUnlock();
-  else showLock();
+  let unlocked = null, sessAuth = null, handoff = null;
+  try {
+    unlocked = sessionStorage.getItem(UNLOCK_KEY);
+    sessAuth = JSON.parse(sessionStorage.getItem(AUTH_KEY));
+    handoff = sessionStorage.getItem(PW_HANDOFF);
+    sessionStorage.removeItem(PW_HANDOFF);
+  } catch (e) {}
+  // reload in the same tab: still unlocked
+  if (unlocked && unlocked === publishedLock.hash && sessAuth && sessAuth.token) { auth = sessAuth; return openEditor(); }
+  showLock();
+  // came from the terminal's "admin" command with the right password
+  if (handoff) {
+    setLockBusy(true);
+    if (await checkPw(handoff)) { await afterPassword(handoff); setLockBusy(false); return; }
+    setLockBusy(false);
+  }
 })();

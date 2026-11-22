@@ -8,14 +8,15 @@ Everything on the site (every text in every language, links, projects, songs, ch
 
 **https://yashnarbek-dev.github.io/admin** (or type `admin` in the terminal)
 
-It asks for the admin password first (change it in the panel under **Settings → Admin password**; only a PBKDF2 hash of it is stored in `content.json`).
+It asks for the admin password (change it in the panel under **Settings → Admin password**; only a PBKDF2 hash of it is stored in `content.json`).
 
-The first time on each device, it also needs a GitHub token so it can save changes:
+The very first time, it also needs a GitHub token so it can save changes. The token is saved in `content.json` encrypted (AES-256-GCM, key derived from the admin password with PBKDF2), so after that the password alone works on any device:
 
 1. Open https://github.com/settings/personal-access-tokens/new
 2. Repository access: **Only select repositories** → `yashnarbek-dev.github.io`
 3. Permissions → Repository permissions → **Contents: Read and write**
-4. Generate the token and paste it into the admin panel.
+4. Expiration: the longest one offered (the panel asks for a new token when it runs out).
+5. Generate the token and paste it into the admin panel.
 
 Then edit, check the live preview on the right, and press **Publish**. The site updates about a minute later.
 
@@ -24,7 +25,7 @@ Then edit, check the live preview on the right, and press **Publish**. The site 
 - **Custom commands** adds new terminal commands with your own text, links and images.
 - **Raw JSON** downloads or restores a backup of all content.
 
-Nobody can change the site without both the password and a GitHub token with write access to this repository.
+The admin password is what protects the site, so keep it long and private.
 
 ## Files
 

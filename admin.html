@@ -315,11 +315,12 @@
   <div class="login-card">
     <div class="brand"><span class="dot"></span>admin<span class="sub">/ portfolio</span></div>
     <h1>Connect to GitHub</h1>
-    <p class="lead">One time per device: the panel needs a GitHub token to save your changes to the site. After that, the password is all you need on this device.</p>
+    <p class="lead">Only once: the panel needs a GitHub token to save changes to your site. It is saved on the site encrypted with your admin password, so after this the password is all you need, on any device.</p>
     <ol class="steps">
       <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → new fine-grained token</a>.</li>
       <li>Repository access: <b>Only select repositories</b> → <b id="repo-name-hint">your site repo</b>.</li>
       <li>Permissions → Repository → <b>Contents: Read and write</b>.</li>
+      <li>Expiration: pick the longest one offered (the panel asks again when it runs out).</li>
       <li>Generate it and paste it below.</li>
     </ol>
     <form id="login-form" autocomplete="off">
@@ -333,13 +334,10 @@
           <label class="field"><span class="flabel">Branch</span><input id="branch" class="mono" spellcheck="false"></label>
         </div>
       </details>
-      <div class="row">
-        <label class="toggle"><input type="checkbox" id="remember" checked><span class="sw"></span><span class="tt"><b>Keep me signed in on this device</b></span></label>
-      </div>
       <div class="row"><button class="btn primary" type="submit" id="login-btn">Connect</button></div>
       <div class="err" id="login-err" role="alert"></div>
     </form>
-    <p class="safe">The token is stored only in this browser and is sent only to api.github.com.</p>
+    <p class="safe">The token is only ever sent to api.github.com. On the site it is stored encrypted (AES-256) with a key made from your admin password.</p>
   </div>
 </div>
 

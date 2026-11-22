@@ -632,7 +632,8 @@ async function submitPassword() {
   if (!ok) await new Promise(r => setTimeout(r, 600));
   pwBusy = false; input.disabled = false;
   if (ok) {
-    try { sessionStorage.setItem(UNLOCK_KEY, lock.hash); } catch (e) {}
+    // hand the password to the admin page once (it unlocks the saved GitHub token there, then is deleted)
+    try { sessionStorage.setItem(UNLOCK_KEY, lock.hash); sessionStorage.setItem("yg-admin-pw", pw); } catch (e) {}
     say(`<span class="acc">${esc(T().adminGranted || "Access granted.")}</span>`);
     setTimeout(() => { location.href = "admin.html"; }, 700);
   } else {
